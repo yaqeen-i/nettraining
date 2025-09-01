@@ -1,0 +1,124 @@
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
+const professionConfig = require("../config/validationConfig");
+
+const userForm = sequelize.define("userForm", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  region:{
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    validate: {
+      isIn: [['NORTHERN', 'CENTRAL', 'SOUTHERN']]
+    },
+    set(value) {
+    this.setDataValue('region', value.toUpperCase());
+    }
+  },
+  area:{
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  institue: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  profession: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  nationalID: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    unique: true,
+    validate: {
+      isNumeric: true,
+      len: [10, 10] 
+      }
+  },
+  phoneNumber: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    unique: true,
+    validate: {
+      is: /^(079|078|077)\d{7}$/,  
+    }
+  },
+  firstName: {
+    type: DataTypes.STRING(15),
+    allowNull: false
+  },
+  fatherName: {
+    type: DataTypes.STRING(15),
+    allowNull: false
+  },
+  grandFatherName: {
+    type: DataTypes.STRING(15),
+    allowNull: false
+  },
+  lastName: {
+    type: DataTypes.STRING(15),
+    allowNull: false
+  },
+  dateOfBirth: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+    validate: {
+      isDate: true,
+      isBefore: new Date().toISOString().split('T')[0] 
+    }
+  },
+  gender:{
+    type: DataTypes.STRING(7),
+    allowNull: false,
+    validate: {
+      isIn: [['MALE', 'FEMALE']]
+    },
+    set(value) {
+    this.setDataValue('gender', value.toUpperCase());
+    }
+  },
+  educationLevel: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    validate: {
+      isIn: [['HIGH_SCHOOL', 'DIPLOMA', 'BACHELOR', 'MASTER', 'MIDDLE_SCHOOL']]
+    },
+    set(value) {
+    this.setDataValue('educationLevel', value.toUpperCase());
+    }
+  },
+  residence: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  howDidYouHearAboutUs: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    validate: {
+      isIn: [['SOCIAL_MEDIA', 'RELATIVE', 'GOOGLE_SEARCH']]
+    },
+    set(value) {
+    this.setDataValue('howDidYouHearAboutUs', value.toUpperCase());
+    }
+  }
+}, {
+  timestamps: true,
+  tableName: "userForms"
+});
+
+userForm.validateProfession = function(region, area, institute, profession, gender) {
+  const regionData = professionConfig.regions[region];
+  if (!regionData) return false;
+
+  const areaData = regionData.areas[area];
+  if (!areaData || !areaData.institutes.includes(institute)) return false;
+
+  const professionData = areaData.professions[profession];
+  return professionData && professionData.includes(gender);
+};
+
+module.exports = userForm;
