@@ -6,4 +6,7 @@ adminApi.interceptors.request.use(config => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+adminApi.getAdminById = (id) => adminApi.get(`/${id}`);
+
 export default adminApi;

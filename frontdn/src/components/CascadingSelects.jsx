@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import formApi from "../services/formApi";
 
 export default function CascadingSelects({ 
-  selectedRegionId, 
-  selectedAreaId, 
-  selectedInstituteId, 
-  selectedProfessionId,
+  selectedRegion, 
+  selectedArea, 
+  selectedInstitute, 
+  selectedProfession,
   gender,
   onSelectionChange 
 }) {
@@ -13,24 +13,44 @@ export default function CascadingSelects({
   const [areas, setAreas] = useState([]);
   const [institutes, setInstitutes] = useState([]);
   const [professions, setProfessions] = useState([]);
-  const [loading, setLoading] = useState({
-    regions: false,
-    areas: false,
-    institutes: false,
-    professions: false
-  });
+  const [loading, setLoading] = useState(false);
+
+  // Styling with AnNahar font and #522524 color scheme
+  const styles = {
+    select: {
+      padding: "12px 15px",
+      border: "2px solid #d6c6ab",
+      borderRadius: "5px",
+      fontSize: "16px",
+      fontFamily: "AnNahar, sans-serif",
+      backgroundColor: "#fff",
+      color: "#522524",
+      outline: "none",
+      transition: "border-color 0.3s ease",
+      width: "100%",
+      marginBottom: "10px",
+      focus: {
+        borderColor: "#522524"
+      },
+      disabled: {
+        backgroundColor: "#f5f5f5",
+        color: "#999",
+        cursor: "not-allowed"
+      }
+    }
+  };
 
   // Fetch regions on mount
   useEffect(() => {
     const fetchRegions = async () => {
-      setLoading(prev => ({ ...prev, regions: true }));
+      setLoading(true);
       try {
         const response = await formApi.getRegions();
         setRegions(response.data);
       } catch (error) {
         console.error("Error fetching regions:", error);
       } finally {
-        setLoading(prev => ({ ...prev, regions: false }));
+        setLoading(false);
       }
     };
     fetchRegions();
@@ -38,16 +58,16 @@ export default function CascadingSelects({
 
   // Fetch areas when region changes
   useEffect(() => {
-    if (selectedRegionId) {
+    if (selectedRegion) {
       const fetchAreas = async () => {
-        setLoading(prev => ({ ...prev, areas: true }));
+        setLoading(true);
         try {
-          const response = await formApi.getAreas(selectedRegionId);
+          const response = await formApi.getAreas(selectedRegion);
           setAreas(response.data);
         } catch (error) {
           console.error("Error fetching areas:", error);
         } finally {
-          setLoading(prev => ({ ...prev, areas: false }));
+          setLoading(false);
         }
       };
       fetchAreas();
@@ -56,20 +76,20 @@ export default function CascadingSelects({
       setInstitutes([]);
       setProfessions([]);
     }
-  }, [selectedRegionId]);
+  }, [selectedRegion]);
 
   // Fetch institutes when area changes
   useEffect(() => {
-    if (selectedAreaId) {
+    if (selectedArea && selectedRegion) {
       const fetchInstitutes = async () => {
-        setLoading(prev => ({ ...prev, institutes: true }));
+        setLoading(true);
         try {
-          const response = await formApi.getInstitutes(selectedAreaId);
+          const response = await formApi.getInstitutes(selectedRegion, selectedArea);
           setInstitutes(response.data);
         } catch (error) {
           console.error("Error fetching institutes:", error);
         } finally {
-          setLoading(prev => ({ ...prev, institutes: false }));
+          setLoading(false);
         }
       };
       fetchInstitutes();
@@ -77,79 +97,119 @@ export default function CascadingSelects({
       setInstitutes([]);
       setProfessions([]);
     }
-  }, [selectedAreaId]);
+  }, [selectedArea, selectedRegion]);
 
   // Fetch professions when institute or gender changes
   useEffect(() => {
-    if (selectedInstituteId && gender) {
+    if (selectedInstitute && selectedArea && selectedRegion && gender) {
       const fetchProfessions = async () => {
-        setLoading(prev => ({ ...prev, professions: true }));
+        setLoading(true);
         try {
-          const response = await formApi.getProfessions(selectedInstituteId, gender);
+          const response = await formApi.getProfessions(selectedRegion, selectedArea, selectedInstitute, gender);
           setProfessions(response.data);
         } catch (error) {
           console.error("Error fetching professions:", error);
         } finally {
-          setLoading(prev => ({ ...prev, professions: false }));
+          setLoading(false);
         }
       };
       fetchProfessions();
     } else {
       setProfessions([]);
     }
-  }, [selectedInstituteId, gender]);
+  }, [selectedInstitute, selectedArea, selectedRegion, gender]);
 
   return (
     <>
       <select 
-        name="regionId"
-        value={selectedRegionId || ''}
-        onChange={(e) => onSelectionChange('regionId', e.target.value)}
+        name="region"
+        value={selectedRegion || ''}
+        onChange={(e) => onSelectionChange('region', e.target.value)}
         required
-        disabled={loading.regions}
+        disabled={loading}
+        style={{
+          ...styles.select,
+          ...(loading ? styles.select.disabled : {}),
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = styles.select.focus.borderColor;
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "#d6c6ab";
+        }}
       >
-        <option value="">Select Region</option>
+        <option value="">اختر المنطقة</option>
         {regions.map(region => (
-          <option key={region.id} value={region.id}>{region.name}</option>
+          <option key={region} value={region}>{region}</option>
         ))}
       </select>
 
       <select 
-        name="areaId"
-        value={selectedAreaId || ''}
-        onChange={(e) => onSelectionChange('areaId', e.target.value)}
-        disabled={!selectedRegionId || loading.areas}
+        name="area"
+        value={selectedArea || ''}
+        onChange={(e) => onSelectionChange('area', e.target.value)}
+        disabled={!selectedRegion || loading}
         required
+        style={{
+          ...styles.select,
+          ...((!selectedRegion || loading) ? styles.select.disabled : {}),
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = styles.select.focus.borderColor;
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "#d6c6ab";
+        }}
       >
-        <option value="">Select Area</option>
+        <option value="">اختر المنطقة الفرعية</option>
         {areas.map(area => (
-          <option key={area.id} value={area.id}>{area.name}</option>
+          <option key={area} value={area}>{area}</option>
         ))}
       </select>
 
       <select 
-        name="instituteId"
-        value={selectedInstituteId || ''}
-        onChange={(e) => onSelectionChange('instituteId', e.target.value)}
-        disabled={!selectedAreaId || loading.institutes}
+        name="institute"
+        value={selectedInstitute || ''}
+        onChange={(e) => onSelectionChange('institute', e.target.value)}
+        disabled={!selectedArea || loading}
         required
+        style={{
+          ...styles.select,
+          ...((!selectedArea || loading) ? styles.select.disabled : {}),
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = styles.select.focus.borderColor;
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "#d6c6ab";
+        }}
       >
-        <option value="">Select Institute</option>
+        <option value="">اختر المعهد</option>
         {institutes.map(institute => (
-          <option key={institute.id} value={institute.id}>{institute.name}</option>
+          <option key={institute} value={institute}>{institute}</option>
         ))}
       </select>
 
       <select 
-        name="professionId"
-        value={selectedProfessionId || ''}
-        onChange={(e) => onSelectionChange('professionId', e.target.value)}
-        disabled={!selectedInstituteId || !gender || loading.professions}
+        name="profession"
+        value={selectedProfession || ''}
+        onChange={(e) => onSelectionChange('profession', e.target.value)}
+        disabled={!selectedInstitute || !gender || loading}
         required
+        style={{
+          ...styles.select,
+          ...((!selectedInstitute || !gender || loading) ? styles.select.disabled : {}),
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = styles.select.focus.borderColor;
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "#d6c6ab";
+        }}
       >
-        <option value="">Select Profession</option>
+        <option value="">اختر التخصص</option>
         {professions.map(profession => (
-          <option key={profession.id} value={profession.id}>{profession.name}</option>
+          <option key={profession} value={profession}>{profession}</option>
         ))}
       </select>
     </>

@@ -1,34 +1,49 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const professionConfig = require("../config/validationConfig");
 
-const userForm = sequelize.define("userForm", {
+const UserForm = sequelize.define("UserForm", {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
   },
-  region:{
+  region: {
     type: DataTypes.STRING(20),
     allowNull: false,
+    references: {
+      model: 'regions',
+      key: 'name'
+    },
     validate: {
       isIn: [['NORTHERN', 'CENTRAL', 'SOUTHERN']]
     },
     set(value) {
-    this.setDataValue('region', value.toUpperCase());
+      this.setDataValue('region', value.toUpperCase());
     }
   },
-  area:{
+  area: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: 'areas',
+      key: 'name'
+    }
   },
-  institue: {
+  institute: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: 'institutes',
+      key: 'name'
+    }
   },
   profession: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
+    references: {
+      model: 'professions',
+      key: 'name'
+    }
   },
   nationalID: {
     type: DataTypes.STRING(10),
@@ -36,15 +51,15 @@ const userForm = sequelize.define("userForm", {
     unique: true,
     validate: {
       isNumeric: true,
-      len: [10, 10] 
-      }
+      len: [10, 10]
+    }
   },
   phoneNumber: {
     type: DataTypes.STRING(10),
     allowNull: false,
     unique: true,
     validate: {
-      is: /^(079|078|077)\d{7}$/,  
+      is: /^(079|078|077)\d{7}$/,
     }
   },
   firstName: {
@@ -68,17 +83,17 @@ const userForm = sequelize.define("userForm", {
     allowNull: false,
     validate: {
       isDate: true,
-      isBefore: new Date().toISOString().split('T')[0] 
+      isBefore: new Date().toISOString().split('T')[0]
     }
   },
-  gender:{
+  gender: {
     type: DataTypes.STRING(7),
     allowNull: false,
     validate: {
       isIn: [['MALE', 'FEMALE']]
     },
     set(value) {
-    this.setDataValue('gender', value.toUpperCase());
+      this.setDataValue('gender', value.toUpperCase());
     }
   },
   educationLevel: {
@@ -88,7 +103,7 @@ const userForm = sequelize.define("userForm", {
       isIn: [['HIGH_SCHOOL', 'DIPLOMA', 'BACHELOR', 'MASTER', 'MIDDLE_SCHOOL']]
     },
     set(value) {
-    this.setDataValue('educationLevel', value.toUpperCase());
+      this.setDataValue('educationLevel', value.toUpperCase());
     }
   },
   residence: {
@@ -102,23 +117,12 @@ const userForm = sequelize.define("userForm", {
       isIn: [['SOCIAL_MEDIA', 'RELATIVE', 'GOOGLE_SEARCH']]
     },
     set(value) {
-    this.setDataValue('howDidYouHearAboutUs', value.toUpperCase());
+      this.setDataValue('howDidYouHearAboutUs', value.toUpperCase());
     }
   }
 }, {
   timestamps: true,
-  tableName: "userForms"
+  tableName: "userForm"
 });
 
-userForm.validateProfession = function(region, area, institute, profession, gender) {
-  const regionData = professionConfig.regions[region];
-  if (!regionData) return false;
-
-  const areaData = regionData.areas[area];
-  if (!areaData || !areaData.institutes.includes(institute)) return false;
-
-  const professionData = areaData.professions[profession];
-  return professionData && professionData.includes(gender);
-};
-
-module.exports = userForm;
+module.exports = UserForm;

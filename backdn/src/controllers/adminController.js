@@ -62,7 +62,24 @@ exports.loginAdmin = async (req, res) => {
     }
     }
 
-    exports.logoutAdmin = (req, res) => {
+
+exports.getAdminById = async (req, res) => {
+      try {
+        const { id } = req.params;
+        const admin = await Admin.findByPk(id, {
+          attributes: { exclude: ['password'] } // Exclude password from the response
+        });
+        if (!admin) {
+          return res.status(404).json({ error: "Admin not found" });
+        }
+        res.json(admin);
+      } catch (err) {
+        console.error("Error in getAdminById:", err);
+        res.status(500).json({ error: err.message , errDetails: err.errors });
+      }
+    };
+    
+exports.logoutAdmin = (req, res) => {
     // Since JWTs are stateless, logout can be handled on the client side by simply deleting the token.
     // For example, if the token is stored in localStorage:
     // localStorage.removeItem('token');
@@ -90,3 +107,5 @@ const handleLogout = async () => {
      */
       res.json({ message: "Logout successful" });
     }
+
+    
