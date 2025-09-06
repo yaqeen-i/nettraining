@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import formApi from "../services/formApi";
-import adminApi from "../services/adminApi"; // Import the admin API
+import adminApi from "../services/adminApi";
 import FormTable from "../components/FormTable";
-import { jwtDecode }  from "jwt-decode"; 
+import { jwtDecode } from "jwt-decode"; 
 
 export default function AdminDashboardPage() {
   const [forms, setForms] = useState([]);
@@ -13,6 +13,23 @@ export default function AdminDashboardPage() {
   const [refreshCount, setRefreshCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [adminName, setAdminName] = useState("");
+
+  // useEffect(() => {
+  //   // Get admin name from JWT token instead of API call
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     try {
+  //       const decoded = jwtDecode(token);
+  //       // Assuming your JWT token contains the username field
+  //       setAdminName(decoded.username || "المشرف");
+  //     } catch (err) {
+  //       console.error("Error decoding token:", err);
+  //       setAdminName("المشرف");
+  //     } finally {
+  //       setAdminLoading(false);
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
     // Fetch admin details
@@ -48,8 +65,6 @@ export default function AdminDashboardPage() {
         
         if (!isMounted) return;
         
-        console.log("API Response:", response);
-        
         let formsData = [];
         if (Array.isArray(response.data)) {
           formsData = response.data;
@@ -57,7 +72,7 @@ export default function AdminDashboardPage() {
           formsData = response.data.data;
         } else {
           console.error("Unexpected data format:", response.data);
-          setError("Unexpected data format received from server");
+          setError("تنسيق بيانات غير متوقع من الخادم");
           return;
         }
         
@@ -71,10 +86,10 @@ export default function AdminDashboardPage() {
         }
         
         setForms(uniqueForms);
-        setFilteredForms(uniqueForms); // Initialize filtered forms with all forms
+        setFilteredForms(uniqueForms);
       } catch (err) {
         console.error("Error fetching forms:", err);
-        setError(err.response?.data?.message || "Failed to fetch forms");
+        setError(err.response?.data?.message || "فشل في جلب النماذج");
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -130,37 +145,38 @@ export default function AdminDashboardPage() {
     setSearchTerm("");
   };
 
-  // Styling
+  // Styling with AnNahar font and #522524 color scheme
   const styles = {
     container: {
       minHeight: "100vh",
-      backgroundColor: "#f5f7f9",
+      backgroundColor: "#f9f3e9",
       padding: "20px",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+      fontFamily: "AnNahar, sans-serif",
+      color: "#522524"
     },
     header: {
-      backgroundColor: "white",
+      backgroundColor: "#fff",
       padding: "20px",
-      borderRadius: "8px",
+      borderRadius: "10px",
       boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
       marginBottom: "20px",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       flexWrap: "wrap",
-      gap: "15px"
+      gap: "15px",
+      border: "2px solid #522524"
     },
     title: {
-      color: "#2c3e50",
+      color: "#522524",
       margin: "0",
       fontSize: "28px",
-      fontWeight: "600"
+      fontWeight: "bold"
     },
     welcomeText: {
-      color: "#2c3e50",
-      margin: "0",
-      fontSize: "20px",
-      fontWeight: "500"
+      color: "#522524",
+      margin: "5px 0 0 0",
+      fontSize: "18px"
     },
     buttonGroup: {
       display: "flex",
@@ -168,39 +184,41 @@ export default function AdminDashboardPage() {
       flexWrap: "wrap"
     },
     button: {
-      backgroundColor: "#3498db",
+      backgroundColor: "#522524",
       color: "white",
       border: "none",
       padding: "10px 15px",
-      borderRadius: "4px",
+      borderRadius: "5px",
       cursor: "pointer",
       fontSize: "14px",
       fontWeight: "500",
       transition: "background-color 0.2s ease",
       display: "flex",
       alignItems: "center",
-      gap: "5px"
+      gap: "5px",
+      fontFamily: "AnNahar, sans-serif"
     },
     logoutButton: {
-      backgroundColor: "#e74c3c"
+      backgroundColor: "#8B0000"
     },
     buttonHover: {
-      backgroundColor: "#2980b9"
+      backgroundColor: "#3a1a1a"
     },
     logoutButtonHover: {
-      backgroundColor: "#c0392b"
+      backgroundColor: "#600000"
     },
     statsCard: {
-      backgroundColor: "white",
+      backgroundColor: "#fff",
       padding: "20px",
-      borderRadius: "8px",
+      borderRadius: "10px",
       boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
       marginBottom: "20px",
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       flexWrap: "wrap",
-      gap: "15px"
+      gap: "15px",
+      border: "2px solid #d6c6ab"
     },
     statsInfo: {
       display: "flex",
@@ -209,7 +227,7 @@ export default function AdminDashboardPage() {
     statsNumber: {
       fontSize: "32px",
       fontWeight: "bold",
-      color: "#2c3e50",
+      color: "#522524",
       margin: "0"
     },
     statsLabel: {
@@ -224,14 +242,15 @@ export default function AdminDashboardPage() {
     },
     searchInput: {
       padding: "10px 15px",
-      border: "1px solid #ddd",
-      borderRadius: "4px",
+      border: "2px solid #d6c6ab",
+      borderRadius: "5px",
       fontSize: "14px",
       minWidth: "250px",
       outline: "none",
       transition: "border-color 0.2s ease",
+      fontFamily: "AnNahar, sans-serif",
       focus: {
-        borderColor: "#3498db"
+        borderColor: "#522524"
       }
     },
     clearButton: {
@@ -239,11 +258,12 @@ export default function AdminDashboardPage() {
       color: "white",
       border: "none",
       padding: "10px 15px",
-      borderRadius: "4px",
+      borderRadius: "5px",
       cursor: "pointer",
       fontSize: "14px",
       fontWeight: "500",
-      transition: "background-color 0.2s ease"
+      transition: "background-color 0.2s ease",
+      fontFamily: "AnNahar, sans-serif"
     },
     clearButtonHover: {
       backgroundColor: "#7f8c8d"
@@ -257,7 +277,7 @@ export default function AdminDashboardPage() {
     },
     spinner: {
       border: "4px solid #f3f3f3",
-      borderTop: "4px solid #3498db",
+      borderTop: "4px solid #522524",
       borderRadius: "50%",
       width: "40px",
       height: "40px",
@@ -289,11 +309,11 @@ export default function AdminDashboardPage() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <h1 style={styles.title}>Admin Dashboard</h1>
+          <h1 style={styles.title}>لوحة تحكم المشرف</h1>
         </div>
         <div style={styles.loadingContainer}>
           <div style={styles.spinner}></div>
-          <p>Loading...</p>
+          <p>جاري التحميل...</p>
         </div>
       </div>
     );
@@ -303,7 +323,7 @@ export default function AdminDashboardPage() {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <h1 style={styles.title}>Admin Dashboard</h1>
+          <h1 style={styles.title}>لوحة تحكم المشرف</h1>
           <div style={styles.buttonGroup}>
             <button 
               style={styles.button}
@@ -315,7 +335,7 @@ export default function AdminDashboardPage() {
                 e.target.style.backgroundColor = styles.button.backgroundColor;
               }}
             >
-              ↻ Refresh
+              ↻ تحديث
             </button>
             <button 
               style={{...styles.button, ...styles.logoutButton}}
@@ -327,12 +347,12 @@ export default function AdminDashboardPage() {
                 e.target.style.backgroundColor = styles.logoutButton.backgroundColor;
               }}
             >
-              Logout
+              تسجيل خروج
             </button>
           </div>
         </div>
         <div style={styles.errorContainer}>
-          <p style={styles.errorText}>Error: {error}</p>
+          <p style={styles.errorText}>خطأ: {error}</p>
           <button 
             style={styles.button}
             onClick={handleRefresh}
@@ -343,7 +363,7 @@ export default function AdminDashboardPage() {
               e.target.style.backgroundColor = styles.button.backgroundColor;
             }}
           >
-            Try Again
+            حاول مرة أخرى
           </button>
         </div>
       </div>
@@ -405,7 +425,7 @@ export default function AdminDashboardPage() {
               e.target.style.borderColor = styles.searchInput.focus.borderColor;
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "#ddd";
+              e.target.style.borderColor = "#d6c6ab";
             }}
           />
           {searchTerm && (

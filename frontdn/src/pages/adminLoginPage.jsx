@@ -24,41 +24,155 @@ export default function AdminLoginPage() {
       window.location.href = "/admin/dashboard";
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || "Login failed");
+      setError(err.response?.data?.error || "فشل تسجيل الدخول");
     } finally {
       setLoading(false);
     }
   };
 
+  // Styling with AnNahar font and #522524 color scheme
+  const styles = {
+    container: {
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#f9f3e9",
+      fontFamily: "AnNahar, sans-serif",
+      padding: "20px"
+    },
+    loginCard: {
+      backgroundColor: "#fff",
+      padding: "40px",
+      borderRadius: "10px",
+      boxShadow: "0 5px 20px rgba(0, 0, 0, 0.1)",
+      width: "100%",
+      maxWidth: "400px",
+      border: "2px solid #522524"
+    },
+    title: {
+      color: "#522524",
+      textAlign: "center",
+      margin: "0 0 30px 0",
+      fontSize: "28px",
+      fontWeight: "bold"
+    },
+    form: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "20px"
+    },
+    input: {
+      padding: "15px",
+      border: "2px solid #d6c6ab",
+      borderRadius: "5px",
+      fontSize: "16px",
+      fontFamily: "AnNahar, sans-serif",
+      backgroundColor: "#fff",
+      color: "#522524",
+      outline: "none",
+      transition: "border-color 0.3s ease",
+      focus: {
+        borderColor: "#522524"
+      }
+    },
+    button: {
+      backgroundColor: "#522524",
+      color: "#fff",
+      border: "none",
+      padding: "15px",
+      borderRadius: "5px",
+      cursor: "pointer",
+      fontSize: "16px",
+      fontFamily: "AnNahar, sans-serif",
+      fontWeight: "bold",
+      transition: "background-color 0.3s ease",
+      hover: {
+        backgroundColor: "#3a1a1a"
+      },
+      disabled: {
+        backgroundColor: "#a08a83",
+        cursor: "not-allowed"
+      }
+    },
+    error: {
+      color: "#d9534f",
+      backgroundColor: "#fdf2f2",
+      padding: "10px",
+      borderRadius: "5px",
+      border: "1px solid #ebccd1",
+      textAlign: "center",
+      fontSize: "14px"
+    },
+    footer: {
+      textAlign: "center",
+      marginTop: "20px",
+      color: "#7f8c8d",
+      fontSize: "14px"
+    }
+  };
+
   return (
-    <div style={containerStyle}>
-      <h2>Admin Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit} style={formStyle}>
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+    <div style={styles.container}>
+      <div style={styles.loginCard}>
+        <h2 style={styles.title}>تسجيل دخول المشرف</h2>
+        {error && <p style={styles.error}>{error}</p>}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <input
+            type="text"
+            name="username"
+            placeholder="اسم المستخدم"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            style={styles.input}
+            onFocus={(e) => {
+              e.target.style.borderColor = styles.input.focus.borderColor;
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#d6c6ab";
+            }}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="كلمة المرور"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            style={styles.input}
+            onFocus={(e) => {
+              e.target.style.borderColor = styles.input.focus.borderColor;
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#d6c6ab";
+            }}
+          />
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{
+              ...styles.button,
+              ...(loading ? styles.button.disabled : {})
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.target.style.backgroundColor = styles.button.hover.backgroundColor;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.target.style.backgroundColor = styles.button.backgroundColor;
+              }
+            }}
+          >
+            {loading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+          </button>
+        </form>
+        <div style={styles.footer}>
+          نظام إدارة النماذج
+        </div>
+      </div>
     </div>
   );
 }
-
-// Simple styling
-const containerStyle = { width: "300px", margin: "100px auto", textAlign: "center" };
-const formStyle = { display: "flex", flexDirection: "column", gap: "10px" };

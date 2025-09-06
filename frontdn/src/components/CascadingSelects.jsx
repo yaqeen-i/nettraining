@@ -138,7 +138,7 @@ export default function CascadingSelects({
           e.target.style.borderColor = "#d6c6ab";
         }}
       >
-        <option value="">اختر المنطقة</option>
+        <option value="">اختر الاقليم</option>
         {regions.map(region => (
           <option key={region} value={region}>{region}</option>
         ))}
@@ -161,7 +161,7 @@ export default function CascadingSelects({
           e.target.style.borderColor = "#d6c6ab";
         }}
       >
-        <option value="">اختر المنطقة الفرعية</option>
+        <option value="">اختر المنطقة</option>
         {areas.map(area => (
           <option key={area} value={area}>{area}</option>
         ))}

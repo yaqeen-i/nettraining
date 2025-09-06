@@ -111,6 +111,7 @@ export default function FormTable({ forms, onEdit }) {
               "Grandfather Name",
               "Last Name",
               "Phone",
+              "Date of Birth",
               "Region",
               "Area",
               "Institute",
@@ -148,6 +149,7 @@ export default function FormTable({ forms, onEdit }) {
               <td style={styles.tableCell}>{form.grandFatherName}</td>
               <td style={styles.tableCell}>{form.lastName}</td>
               <td style={styles.tableCell}>{form.phoneNumber}</td>
+              <td style={styles.tableCell}>{new Date(form.dateOfBirth).toLocaleDateString()}</td>
               <td style={styles.tableCell}>{form.region}</td>
               <td style={styles.tableCell}>{form.area}</td>
               <td style={styles.tableCell}>{form.institute}</td>
