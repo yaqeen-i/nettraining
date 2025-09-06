@@ -3,6 +3,7 @@ import formApi from "../services/formApi";
 import adminApi from "../services/adminApi";
 import FormTable from "../components/FormTable";
 import { jwtDecode } from "jwt-decode"; 
+import "../styles/AdminDashboardPage.css";
 
 export default function AdminDashboardPage() {
   const [forms, setForms] = useState([]);
@@ -145,175 +146,17 @@ export default function AdminDashboardPage() {
     setSearchTerm("");
   };
 
-  // Styling with AnNahar font and #522524 color scheme
-  const styles = {
-    container: {
-      minHeight: "100vh",
-      backgroundColor: "#f9f3e9",
-      padding: "20px",
-      fontFamily: "AnNahar, sans-serif",
-      color: "#522524"
-    },
-    header: {
-      backgroundColor: "#fff",
-      padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-      marginBottom: "20px",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      flexWrap: "wrap",
-      gap: "15px",
-      border: "2px solid #522524"
-    },
-    title: {
-      color: "#522524",
-      margin: "0",
-      fontSize: "28px",
-      fontWeight: "bold"
-    },
-    welcomeText: {
-      color: "#522524",
-      margin: "5px 0 0 0",
-      fontSize: "18px"
-    },
-    buttonGroup: {
-      display: "flex",
-      gap: "10px",
-      flexWrap: "wrap"
-    },
-    button: {
-      backgroundColor: "#522524",
-      color: "white",
-      border: "none",
-      padding: "10px 15px",
-      borderRadius: "5px",
-      cursor: "pointer",
-      fontSize: "14px",
-      fontWeight: "500",
-      transition: "background-color 0.2s ease",
-      display: "flex",
-      alignItems: "center",
-      gap: "5px",
-      fontFamily: "AnNahar, sans-serif"
-    },
-    logoutButton: {
-      backgroundColor: "#8B0000"
-    },
-    buttonHover: {
-      backgroundColor: "#3a1a1a"
-    },
-    logoutButtonHover: {
-      backgroundColor: "#600000"
-    },
-    statsCard: {
-      backgroundColor: "#fff",
-      padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-      marginBottom: "20px",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      flexWrap: "wrap",
-      gap: "15px",
-      border: "2px solid #d6c6ab"
-    },
-    statsInfo: {
-      display: "flex",
-      flexDirection: "column"
-    },
-    statsNumber: {
-      fontSize: "32px",
-      fontWeight: "bold",
-      color: "#522524",
-      margin: "0"
-    },
-    statsLabel: {
-      fontSize: "14px",
-      color: "#7f8c8d",
-      margin: "5px 0 0 0"
-    },
-    searchContainer: {
-      display: "flex",
-      alignItems: "center",
-      gap: "10px"
-    },
-    searchInput: {
-      padding: "10px 15px",
-      border: "2px solid #d6c6ab",
-      borderRadius: "5px",
-      fontSize: "14px",
-      minWidth: "250px",
-      outline: "none",
-      transition: "border-color 0.2s ease",
-      fontFamily: "AnNahar, sans-serif",
-      focus: {
-        borderColor: "#522524"
-      }
-    },
-    clearButton: {
-      backgroundColor: "#95a5a6",
-      color: "white",
-      border: "none",
-      padding: "10px 15px",
-      borderRadius: "5px",
-      cursor: "pointer",
-      fontSize: "14px",
-      fontWeight: "500",
-      transition: "background-color 0.2s ease",
-      fontFamily: "AnNahar, sans-serif"
-    },
-    clearButtonHover: {
-      backgroundColor: "#7f8c8d"
-    },
-    loadingContainer: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      height: "200px",
-      flexDirection: "column"
-    },
-    spinner: {
-      border: "4px solid #f3f3f3",
-      borderTop: "4px solid #522524",
-      borderRadius: "50%",
-      width: "40px",
-      height: "40px",
-      animation: "spin 1s linear infinite",
-      marginBottom: "15px"
-    },
-    errorContainer: {
-      backgroundColor: "#ffecec",
-      border: "1px solid #f5aca6",
-      borderRadius: "8px",
-      padding: "20px",
-      margin: "20px 0",
-      textAlign: "center"
-    },
-    errorText: {
-      color: "#d9534f",
-      margin: "0",
-      fontSize: "16px"
-    },
-    noResults: {
-      textAlign: "center",
-      padding: "40px",
-      color: "#7f8c8d",
-      fontSize: "16px"
-    }
-  };
-
-  if (loading || adminLoading) {
+if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.header}>
-          <h1 style={styles.title}>لوحة تحكم المشرف</h1>
+      <div className="container">
+        <div className="header">
+          <div className="titleContainer">
+            <h1 className="title">لوحة تحكم المشرف</h1>
+          </div>
         </div>
-        <div style={styles.loadingContainer}>
-          <div style={styles.spinner}></div>
-          <p>جاري التحميل...</p>
+        <div className="loadingContainer">
+          <div className="spinner"></div>
+          <p>جاري تحميل النماذج...</p>
         </div>
       </div>
     );
@@ -321,48 +164,27 @@ export default function AdminDashboardPage() {
 
   if (error) {
     return (
-      <div style={styles.container}>
-        <div style={styles.header}>
-          <h1 style={styles.title}>لوحة تحكم المشرف</h1>
-          <div style={styles.buttonGroup}>
-            <button 
-              style={styles.button}
-              onClick={handleRefresh}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = styles.button.backgroundColor;
-              }}
-            >
+      <div className="container">
+        <div className="header">
+          <div className="titleContainer">
+            <h1 className="title">لوحة تحكم المشرف</h1>
+            <p className="welcomeText">مرحباً، {adminName}</p>
+          </div>
+          <div className="buttonGroup">
+            <button className="button" onClick={handleRefresh}>
               ↻ تحديث
             </button>
-            <button 
-              style={{...styles.button, ...styles.logoutButton}}
+            <button
+              className="button logoutButton"
               onClick={handleLogout}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = styles.logoutButtonHover.backgroundColor;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = styles.logoutButton.backgroundColor;
-              }}
             >
               تسجيل خروج
             </button>
           </div>
         </div>
-        <div style={styles.errorContainer}>
-          <p style={styles.errorText}>خطأ: {error}</p>
-          <button 
-            style={styles.button}
-            onClick={handleRefresh}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = styles.button.backgroundColor;
-            }}
-          >
+        <div className="errorContainer">
+          <p className="errorText">خطأ: {error}</p>
+          <button className="button" onClick={handleRefresh}>
             حاول مرة أخرى
           </button>
         </div>
@@ -371,73 +193,48 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <div>
-          <h1 style={styles.title}>لوحة تحكم المشرف</h1>
-          <p style={styles.welcomeText}>مرحباً، {adminName}</p>
+    <div className="container">
+      <div className="header">
+        <div className="titleContainer">
+          <h1 className="title">
+            لوحة تحكم المشرف للطلاب المتقدمين - Admin Dashboard for applicants
+          </h1>
+          <p className="welcomeText">مرحباً، {adminName}</p>
         </div>
-        <div style={styles.buttonGroup}>
-          <button 
-            style={styles.button}
-            onClick={handleRefresh}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = styles.button.backgroundColor;
-            }}
-          >
+        <div className="buttonGroup">
+          <button className="button" onClick={handleRefresh}>
             ↻ تحديث
           </button>
-          <button 
-            style={{...styles.button, ...styles.logoutButton}}
+          <button
+            className="button logoutButton"
             onClick={handleLogout}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = styles.logoutButtonHover.backgroundColor;
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = styles.logoutButton.backgroundColor;
-            }}
           >
             تسجيل خروج
           </button>
         </div>
       </div>
 
-      <div style={styles.statsCard}>
-        <div style={styles.statsInfo}>
-          <p style={styles.statsNumber}>{filteredForms.length}</p>
-          <p style={styles.statsLabel}>
+      <div className="statsCard">
+        <div className="statsInfo">
+          <p className="statsNumber">{filteredForms.length}</p>
+          <p className="statsLabel">
             {searchTerm ? "النماذج المصفاة" : "إجمالي نماذج التقديم"}
             {searchTerm && ` (بحث: ${searchTerm})`}
           </p>
         </div>
-        
-        <div style={styles.searchContainer}>
+
+        <div className="searchContainer">
           <input
             type="text"
-            placeholder="ابحث برقم الهوية..."
+            placeholder="ابحث بالرقم الوطني..."
             value={searchTerm}
             onChange={handleSearchChange}
-            style={styles.searchInput}
-            onFocus={(e) => {
-              e.target.style.borderColor = styles.searchInput.focus.borderColor;
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "#d6c6ab";
-            }}
+            className="searchInput"
           />
           {searchTerm && (
             <button
-              style={styles.clearButton}
+              className="clearButton"
               onClick={clearSearch}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = styles.clearButtonHover.backgroundColor;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = styles.clearButton.backgroundColor;
-              }}
             >
               مسح
             </button>
@@ -446,21 +243,12 @@ export default function AdminDashboardPage() {
       </div>
 
       {filteredForms.length === 0 ? (
-        <div style={styles.noResults}>
+        <div className="noResults">
           {searchTerm ? (
             <>
               <h3>لم يتم العثور على نماذج</h3>
-              <p>لا توجد نماذج تطابق رقم الهوية: {searchTerm}</p>
-              <button 
-                style={styles.button}
-                onClick={clearSearch}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = styles.buttonHover.backgroundColor;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = styles.button.backgroundColor;
-                }}
-              >
+              <p>لا توجد نماذج تطابق الرقم الوطني: {searchTerm}</p>
+              <button className="button" onClick={clearSearch}>
                 عرض جميع النماذج
               </button>
             </>
