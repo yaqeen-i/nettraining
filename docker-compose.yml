@@ -1,0 +1,62 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: netsite_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS:-0000}
+      MYSQL_DATABASE: ${DB_NAME:-feedback_system}
+    ports:
+      - "3306:3306"
+    command: [
+      "--default-authentication-plugin=caching_sha2_password",
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci"
+    ]
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_PASS:-0000}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backdn
+      dockerfile: Dockerfile
+    container_name: netsite_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+    - ./backdn/.env     # <-- this loads your .env file
+    environment:
+      DB_HOST: db        # service name, not localhost
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: ${DB_PASS:-0000}
+      DB_NAME: ${DB_NAME:-feedback_system}
+      PORT: 5000
+      NODE_ENV: production
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontdn
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:5000}
+    container_name: netsite_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000" # React build served by nginx at http://localhost:3000
+
+volumes:
+  db_data:

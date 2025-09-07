@@ -34,7 +34,7 @@ export default function FormTable({ forms, onEdit }) {
               "Grandfather Name",
               "Last Name",
               "Phone",
-              "Data of Birth",
+              "Date of Birth",
               "Region",
               "Area",
               "Institute",

@@ -2,6 +2,7 @@ const { UserForm } = require("../models");
 const { professionConfig } = require("../config/validationConfig");
 const { Op } = require("sequelize"); // Import Sequelize operators
 
+// backdn/src/controllers/formController.js
 console.log('Profession config loaded:', professionConfig ? 'Yes' : 'No');
 if (professionConfig) {
   console.log('Regions available:', Object.keys(professionConfig.regions));
@@ -82,7 +83,8 @@ exports.createForm = async (req, res) => {
         console.log("Missing required fields:", req.body);
         return res.status(400).json({ 
           error: "Missing required fields",
-          received: req.body
+          received: req.body,
+          errDetails: err.errors
         });
       }  
     

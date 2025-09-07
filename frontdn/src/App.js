@@ -4,6 +4,8 @@ import AdminLoginPage from "./pages/adminLoginPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import FormEditPage from "./pages/FormEditPage";
 
+//frontdn/src/App.js
+
 // Simple auth check: does a token exist in localStorage
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -29,7 +31,7 @@ function App() {
 
         {/* Redirect unknown routes to login */}
         <Route path="*" element={<Navigate to="/login" />} />
-        import FormEditPage from "./pages/FormEditPage";
+        
         
         <Route path="/forms/:id/edit" element={<FormEditPage />} />
 
