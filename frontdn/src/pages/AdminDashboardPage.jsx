@@ -15,23 +15,6 @@ export default function AdminDashboardPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [adminName, setAdminName] = useState("");
 
-  // useEffect(() => {
-  //   // Get admin name from JWT token instead of API call
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     try {
-  //       const decoded = jwtDecode(token);
-  //       // Assuming your JWT token contains the username field
-  //       setAdminName(decoded.username || "المشرف");
-  //     } catch (err) {
-  //       console.error("Error decoding token:", err);
-  //       setAdminName("المشرف");
-  //     } finally {
-  //       setAdminLoading(false);
-  //     }
-  //   }
-  // }, []);
-
   useEffect(() => {
     // Fetch admin details
     const fetchAdminDetails = async () => {
@@ -146,7 +129,67 @@ export default function AdminDashboardPage() {
     setSearchTerm("");
   };
 
-if (loading) {
+  // Function to export data to CSV
+  const exportToCSV = () => {
+    if (filteredForms.length === 0) {
+      alert("لا توجد بيانات للتصدير");
+      return;
+    }
+
+    // Define CSV headers
+    const headers = [
+      "National ID",
+      "Gender",
+      "First Name",
+      "Father Name",
+      "Grandfather Name",
+      "Last Name",
+      "Phone",
+      "Date of Birth",
+      "Region",
+      "Area",
+      "Institute",
+      "Profession",
+      "How did he hear about us?"
+    ];
+
+    // Convert data to CSV format
+    const csvData = filteredForms.map(form => {
+      return [
+        form.nationalID || "",
+        form.gender || "",
+        form.firstName || "",
+        form.fatherName || "",
+        form.grandFatherName || "",
+        form.lastName || "",
+        form.phoneNumber || "",
+        form.dateOfBirth ? new Date(form.dateOfBirth).toLocaleDateString("en-GB") : "",
+        form.region || "",
+        form.area || "",
+        form.institute || "",
+        form.profession || "",
+        form.howDidYouHearAboutUs || ""
+      ];
+    });
+
+    // Combine headers and data
+    const csvContent = [headers, ...csvData]
+      .map(row => row.map(field => `"${field}"`).join(","))
+      .join("\n");
+
+    // Create download link
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `applicants_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  if (loading) {
     return (
       <div className="container">
         <div className="header">
@@ -204,6 +247,9 @@ if (loading) {
         <div className="buttonGroup">
           <button className="button" onClick={handleRefresh}>
             ↻ تحديث
+          </button>
+          <button className="button exportButton" onClick={exportToCSV}>
+             تصدير إلى Excel
           </button>
           <button
             className="button logoutButton"
