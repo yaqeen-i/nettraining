@@ -33,6 +33,7 @@ function App() {
         <Route path="*" element={<Navigate to="/login" />} />
         
         
+        {/* Form edit page (private) */}
         <Route path="/forms/:id/edit" element={<FormEditPage />} />
 
       </Routes>

@@ -40,7 +40,7 @@ exports.loginAdmin = async (req, res) => {
     try {
         const { username, password } = req.body;
     
-        // Find the admin by username
+        //  admin by username
         const admin = await Admin.findOne({ where: { username } });
         if (!admin) {
         return res.status(400).json({ error: "Invalid username or password" });
@@ -53,7 +53,7 @@ exports.loginAdmin = async (req, res) => {
         }
     
         // generate a JWT token
-        const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     
         res.json({ message: "Login successful", token });
     } catch (err) {
@@ -67,7 +67,7 @@ exports.getAdminById = async (req, res) => {
       try {
         const { id } = req.params;
         const admin = await Admin.findByPk(id, {
-          attributes: { exclude: ['password'] } // Exclude password from the response
+          attributes: { exclude: ['password'] } // exclude password from the response, security obviously
         });
         if (!admin) {
           return res.status(404).json({ error: "Admin not found" });

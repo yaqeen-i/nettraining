@@ -12,7 +12,12 @@ const authenticateAdmin = (req, res, next) => {
     req.user = decoded; // i attach admin ID to request object
     next();
   } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: "Token expired" });
+    }
     console.error("Error in authenticateAdmin:", err);
     res.status(401).json({ error: "Invalid token" });
   }
 }
+
+module.exports = { authenticateAdmin };
