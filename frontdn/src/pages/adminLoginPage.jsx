@@ -13,22 +13,22 @@ export default function AdminLoginPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    // e.preventDefault();
+    // setLoading(true);
+    // setError(null);
 
-    try {
-      const { data } = await adminApi.post("/login", formData);
-      // Save JWT token
-      localStorage.setItem("token", data.token);
+    // try {
+    //   const { data } = await adminApi.post("/login", formData);
+    //   // Save JWT token
+    //   localStorage.setItem("token", data.token);
       // Redirect to dashboard
       window.location.href = "/admin/dashboard";
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.error || "فشل تسجيل الدخول");
-    } finally {
-      setLoading(false);
-    }
+    // } catch (err) {
+    //   console.error(err);
+    //   setError(err.response?.data?.error || "فشل تسجيل الدخول");
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
