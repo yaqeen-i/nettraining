@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
   };
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     // setLoading(true);
     // setError(null);
 
