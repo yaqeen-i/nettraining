@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import adminApi from "../services/adminApi";
+//import adminApi from "../services/adminApi";
 import "../styles/AdminLoginPage.css";
 
 export default function AdminLoginPage() {
