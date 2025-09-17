@@ -24,7 +24,7 @@ Profession.belongsTo(Region, { foreignKey: 'regionName', targetKey: 'name' });
 UserForm.belongsTo(Region, { foreignKey: 'region', targetKey: 'name' });
 UserForm.belongsTo(Area, { foreignKey: 'area', targetKey: 'name' });
 UserForm.belongsTo(Institute, { foreignKey: 'institute', targetKey: 'name' });
-UserForm.belongsTo(Profession, { foreignKey: 'profession', targetKey: 'name' });
+//UserForm.belongsTo(Profession, { foreignKey: 'profession', targetKey: 'name' });
 
 module.exports = {
   sequelize,

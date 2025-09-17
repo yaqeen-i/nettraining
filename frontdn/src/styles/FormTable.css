@@ -52,11 +52,33 @@
   letter-spacing: 0.5px;
 }
 
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white; 
+}
+
+.status-badge.pending {
+  background-color: #8B4513;
+}
+
+.status-badge.accepted {
+  background-color: #228B22; 
+}
+
+.status-badge.rejected {
+  background-color: #B22222; 
+}
+
 .form-table td {
   padding: 12px 15px;
   font-family: AnNahar, sans-serif;
   border-bottom: 1px solid #e0e0e0;
   font-size: 14px;
+  font-weight: bold;
   color: #333;
 }
 

@@ -16,7 +16,7 @@ export default function AdminDashboardPage() {
   const [adminName, setAdminName] = useState("");
 
   useEffect(() => {
-    // Fetch admin details
+    
     const fetchAdminDetails = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -27,7 +27,7 @@ export default function AdminDashboardPage() {
           
           // Fetch admin details using the ID
           const response = await adminApi.getAdminById(adminId);
-          setAdminName(response.data.username); // Assuming the response has a username field
+          setAdminName(response.data.username); 
         }
       } catch (err) {
         console.error("Error fetching admin details:", err);
@@ -113,7 +113,7 @@ export default function AdminDashboardPage() {
 
   const handleRefresh = () => {
     setRefreshCount(prev => prev + 1);
-    setSearchTerm(""); // Clear search on refresh
+    setSearchTerm(""); 
   };
 
   const handleLogout = () => {
@@ -129,14 +129,14 @@ export default function AdminDashboardPage() {
     setSearchTerm("");
   };
 
-  // Function to export data to CSV
+  
   const exportToCSV = () => {
     if (filteredForms.length === 0) {
       alert("لا توجد بيانات للتصدير");
       return;
     }
 
-    // Define CSV headers
+    // define CSV headers
     const headers = [
       "National ID",
       "Gender",
@@ -150,10 +150,12 @@ export default function AdminDashboardPage() {
       "Area",
       "Institute",
       "Profession",
+      "Status",
+      "Marks",
       "How did he hear about us?"
     ];
 
-    // Convert data to CSV format
+    // convert data to CSV format
     const csvData = filteredForms.map(form => {
       return [
         form.nationalID || "",
@@ -168,16 +170,18 @@ export default function AdminDashboardPage() {
         form.area || "",
         form.institute || "",
         form.profession || "",
+        form.status || "PENDING",
+        form.mark || "",
         form.howDidYouHearAboutUs || ""
       ];
     });
 
-    // Combine headers and data
+    // combine headers and data
     const csvContent = [headers, ...csvData]
       .map(row => row.map(field => `"${field}"`).join(","))
       .join("\n");
 
-    // Create download link
+    // for download link creation download link
     const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

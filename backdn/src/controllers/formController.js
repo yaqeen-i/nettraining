@@ -150,7 +150,7 @@ exports.createForm = async (req, res) => {
       });
     }
     
-    res.status(500).json({ error: err.message, details: err.errors });
+    res.status(400).json({ error: err.message, details: err.errors });
   }
 };
 

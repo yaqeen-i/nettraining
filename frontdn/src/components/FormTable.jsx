@@ -16,6 +16,17 @@ export default function FormTable({ forms, onEdit }) {
     setSelectedForm(null);
   };
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'status-badge accepted';
+      case 'REJECTED':
+        return 'status-badge rejected';
+      default:
+        return 'status-badge pending';
+    }
+  };
+
   return (
     <div className="form-table-container">
       <div className="form-table-header">
@@ -29,16 +40,18 @@ export default function FormTable({ forms, onEdit }) {
             {[
               "National ID",
               "Gender",
-              "First Name",
               "Father Name",
               "Grandfather Name",
               "Last Name",
+              "First Name", 
               "Phone",
               "Date of Birth",
               "Region",
               "Area",
               "Institute",
               "Profession",
+              "Status",
+              "Marks",
               "How did he hear about us?",
               "Actions",
             ].map((header, index) => (
@@ -51,16 +64,22 @@ export default function FormTable({ forms, onEdit }) {
             <tr key={`${form.id}-${form.nationalID}-${form.phoneNumber}`}>
               <td>{form.nationalID}</td>
               <td>{form.gender}</td>
-              <td>{form.firstName}</td>
               <td>{form.fatherName}</td>
               <td>{form.grandFatherName}</td>
               <td>{form.lastName}</td>
+              <td>{form.firstName}</td>
               <td>{form.phoneNumber}</td>
               <td>{new Date(form.dateOfBirth).toLocaleDateString("en-GB")}</td>
               <td>{form.region}</td>
               <td>{form.area}</td>
               <td>{form.institute}</td>
               <td>{form.profession}</td>
+             <td>
+                <span className={getStatusClass(form.status)}>
+                  {form.status || 'PENDING'}
+                </span>
+              </td>
+              <td>{form.mark}</td>
               <td>{form.howDidYouHearAboutUs}</td>
               <td>
                 <button

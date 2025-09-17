@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 // authenticate admin using JWT
 const authenticateAdmin = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
+  //console.log("Authorization header:", req.header("Authorization"));
+  //console.log("Extracted token:", token);
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
   }

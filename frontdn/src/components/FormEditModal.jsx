@@ -56,10 +56,13 @@ export default function FormEditModal({ form, onClose, onSave }) {
         area: formData.area,
         institute: formData.institute,
         profession: formData.profession,
+        status: formData.status,
+        mark: formData.mark
       };
 
       const { data } = await formApi.updateForm(form.id, updateData);
       onSave(data);
+      window.location.reload();
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.error || "Failed to update form");
@@ -201,6 +204,30 @@ export default function FormEditModal({ form, onClose, onSave }) {
             <option value="MASTER">ماجستير</option>
           </select>
 
+          <label>الحالة</label>
+            <select
+              name="status"
+              value={formData.status || "PENDING"}
+              onChange={handleChange}
+              className="modal-select"
+            >
+              <option value="PENDING">Pending</option>
+              <option value="ACCEPTED">Accepted</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+
+            <label>Mark (0-100):</label>
+            <input
+              type="number"
+              name="mark"
+              min="0"
+              max="100"
+              value={formData.mark || ""}
+              onChange={handleChange}
+              placeholder="Enter mark"
+              className="modal-input"
+            />
+            
           <label>كيف سمعت عنا؟</label>
           <select
             name="howDidYouHearAboutUs"

@@ -40,10 +40,10 @@ const UserForm = sequelize.define("UserForm", {
   profession: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    references: {
-      model: 'professions',
-      key: 'name'
-    }
+    // references: {
+    //   model: 'professions',
+    //   key: 'name'
+    // }
   },
   nationalID: {
     type: DataTypes.STRING(10),
@@ -119,8 +119,28 @@ const UserForm = sequelize.define("UserForm", {
     set(value) {
       this.setDataValue('howDidYouHearAboutUs', value.toUpperCase());
     }
+  },
+  status: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    defaultValue: 'PENDING',
+    validate: {
+      isIn: [['PENDING', 'ACCEPTED', 'REJECTED']]
+    },
+    set(value) {
+      this.setDataValue('status', value.toUpperCase());
+    }
+  },
+  mark: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    validate: {
+      min: 0,
+      max: 100
+    }
   }
-}, {
+},
+ {
   timestamps: true,
   tableName: "userForm"
 });
