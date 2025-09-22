@@ -186,3 +186,75 @@ exports.putForm = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.importForms = async (req, res) => {
+  try {
+    const formsData = req.body;
+    console.log(`Received ${formsData.length} records for import`);
+    
+    let count = 0;
+    let errors = [];
+
+    for (const [index, formData] of formsData.entries()) {
+      try {
+        console.log(`Processing record ${index + 1}:`, formData);
+        
+        // Validate the form data
+        const validation = validateFormData({
+          region: formData.region,
+          area: formData.area,
+          institute: formData.institute, 
+          profession: formData.profession,
+          gender: formData.gender
+        });
+        
+        if (!validation.valid) {
+          console.log(`Validation failed for record ${index + 1}:`, validation.error);
+          errors.push({ data: formData, error: validation.error });
+          continue;
+        }
+
+        // Check if form already exists
+        const existingForm = await UserForm.findOne({
+          where: {
+            [Op.or]: [
+              { nationalID: formData.nationalID },
+              { phoneNumber: formData.phoneNumber }
+            ]
+          }
+        });
+
+        if (existingForm) {
+          console.log(`Updating existing form with ID: ${existingForm.id}`);
+          // Update existing form
+          await UserForm.update(formData, {
+            where: { id: existingForm.id }
+          });
+        } else {
+          console.log("Creating new form");
+          // Create new form
+          await UserForm.create(formData);
+        }
+        
+        count++;
+        console.log(`Successfully processed record ${index + 1}`);
+      } catch (error) {
+        console.error(`Error processing record ${index + 1}:`, error);
+        errors.push({ data: formData, error: error.message });
+      }
+    }
+
+    console.log(`Import completed. Success: ${count}, Errors: ${errors.length}`);
+    
+    res.json({ 
+      success: true, 
+      count, 
+      errors,
+      message: `تم استيراد ${count} سجل بنجاح مع ${errors.length} أخطاء` 
+    });
+  } catch (error) {
+    console.error('Error importing forms:', error);
+    res.status(500).json({ error: 'فشل في استيراد البيانات' });
+  }
+};

@@ -204,3 +204,37 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 2px solid #d6c6ab;
 }
+
+/* Import button styles */
+.importButton {
+  background-color: #17a2b8;
+  margin: 0 8px;
+}
+
+.importButton:hover:not(:disabled) {
+  background-color: #138496;
+}
+
+.importButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Import status messages */
+.importError {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 15px 0;
+  border: 1px solid #f5c6cb;
+}
+
+.importSuccess {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 15px 0;
+  border: 1px solid #c3e6cb;
+}

@@ -44,11 +44,13 @@ export default function FormTable({ forms, onEdit }) {
               "Grandfather Name",
               "Last Name",
               "First Name", 
-              "Phone",
+              "Phone Number",
+              "Education Level", 
               "Date of Birth",
               "Region",
               "Area",
               "Institute",
+              "Residence",
               "Profession",
               "Status",
               "Marks",
@@ -69,10 +71,12 @@ export default function FormTable({ forms, onEdit }) {
               <td>{form.lastName}</td>
               <td>{form.firstName}</td>
               <td>{form.phoneNumber}</td>
-              <td>{new Date(form.dateOfBirth).toLocaleDateString("en-GB")}</td>
+              <td>{form.educationLevel}</td>
+              <td>{new Date(form.dateOfBirth).toISOString().split("T")[0]}</td>
               <td>{form.region}</td>
               <td>{form.area}</td>
               <td>{form.institute}</td>
+              <td>{form.residence}</td>
               <td>{form.profession}</td>
              <td>
                 <span className={getStatusClass(form.status)}>

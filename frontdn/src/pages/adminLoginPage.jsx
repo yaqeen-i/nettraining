@@ -19,9 +19,9 @@ export default function AdminLoginPage() {
 
     try {
       const { data } = await adminApi.post("/login", formData);
-      // Save JWT token
+      // save JWT token
       localStorage.setItem("token", data.token);
-      // Redirect to dashboard
+      // redirect to dashboard
       window.location.href = "/admin/dashboard";
     } catch (err) {
       console.error(err);

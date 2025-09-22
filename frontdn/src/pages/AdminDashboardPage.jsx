@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useRef} from "react";
 import formApi from "../services/formApi";
 import adminApi from "../services/adminApi";
 import FormTable from "../components/FormTable";
 import { jwtDecode } from "jwt-decode"; 
+import * as XLSX from "xlsx";
 import "../styles/AdminDashboardPage.css";
 
 export default function AdminDashboardPage() {
@@ -14,6 +15,11 @@ export default function AdminDashboardPage() {
   const [refreshCount, setRefreshCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [adminName, setAdminName] = useState("");
+  const [importLoading, setImportLoading] = useState(false);
+  const [importError, setImportError] = useState(null);
+  const [importSuccess, setImportSuccess] = useState(null);
+  const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     
@@ -144,11 +150,13 @@ export default function AdminDashboardPage() {
       "Father Name",
       "Grandfather Name",
       "Last Name",
-      "Phone",
+      "Phone Number",
+      "Education Level",
       "Date of Birth",
       "Region",
       "Area",
       "Institute",
+      "Residence",
       "Profession",
       "Status",
       "Marks",
@@ -165,10 +173,12 @@ export default function AdminDashboardPage() {
         form.grandFatherName || "",
         form.lastName || "",
         form.phoneNumber || "",
+        form.educationLevel || "",
         form.dateOfBirth ? new Date(form.dateOfBirth).toLocaleDateString("en-GB") : "",
         form.region || "",
         form.area || "",
         form.institute || "",
+        form.residence || "",
         form.profession || "",
         form.status || "PENDING",
         form.mark || "",
@@ -178,7 +188,7 @@ export default function AdminDashboardPage() {
 
     // combine headers and data
     const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(","))
+      .map(sheet => sheet.map(field => `"${field}"`).join(","))
       .join("\n");
 
     // for download link creation download link
@@ -192,6 +202,152 @@ export default function AdminDashboardPage() {
     link.click();
     document.body.removeChild(link);
   };
+
+  const handleImportClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  setImportLoading(true);
+  setImportError(null);
+  setImportSuccess(null);
+
+  try {
+    // Read the Excel file
+    const data = await readExcelFile(file);
+    console.log("Imported data:", data);
+    
+    // Map Excel column names to database field names
+    const mappedData = data.map(sheet => {
+      return {
+        nationalID: sheet['National ID'] ,
+        phoneNumber: sheet['Phone Number'] ,
+        firstName: sheet['First Name'] ,
+        fatherName: sheet['Father Name'] ,
+        grandFatherName: sheet['Grandfather Name'] ,
+        lastName: sheet['Last Name'],
+        dateOfBirth: convertExcelDate(sheet['Date of Birth']),
+        gender: sheet['Gender'] ,
+        educationLevel: sheet['Education Level'],
+        residence: sheet['Residence'],
+        howDidYouHearAboutUs: sheet['How did he hear about us?'],
+        region: sheet['Region'] ,
+        area: sheet['Area'],
+        institute: sheet['Institute'],
+        profession: sheet['Profession'] ,
+        status: sheet['Status'] ,
+        mark: sheet['Mark'] ,
+      };
+    });
+    
+    console.log("Mapped data:", mappedData);
+    
+    // send mapped data to the server api
+    const response = await formApi.importForms(mappedData);
+    console.log("Import response:", response);
+    
+    if (response.data.count === 0 && response.data.errors.length > 0) {
+      // log
+      const firstError = response.data.errors[0];
+      setImportError(`فشل في استيراد البيانات: ${firstError.error}`);
+    } else {
+      // success message
+      setImportSuccess(`تم استيراد ${response.data.count} سجل بنجاح مع ${response.data.errors.length} أخطاء`);
+    }
+    
+    
+    handleRefresh();
+  } catch (err) {
+    console.error("Error importing file:", err);
+    setImportError(err.response?.data?.error || "فشل في استيراد الملف");
+  } finally {
+    setImportLoading(false);
+  
+    e.target.value = "";
+  }
+};
+
+const convertExcelDate = (excelDate) => {
+  if (!excelDate) return null;
+  
+  // If it's already a proper date string, return it
+  if (typeof excelDate === 'string' && excelDate.includes('-')) {
+    return excelDate;
+  }
+  
+  // If it's an Excel serial date number, convert it
+  if (typeof excelDate === 'number') {
+    const date = new Date((excelDate - 25569) * 86400 * 1000);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  
+  // If it's a Date object, then format it
+  if (excelDate instanceof Date) {
+    return excelDate.toISOString().split('T')[0];
+  }
+  
+  return null;
+};
+
+  const readExcelFile = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          
+          // Get the first worksheet
+          const worksheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[worksheetName];
+          
+          // Convert to JSON
+          const jsonData = XLSX.utils.sheet_to_json(worksheet);
+          resolve(jsonData);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      reader.onerror = (error) => reject(error);
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const validateImportedData = (data) => {
+  if (!data || data.length === 0) {
+    console.log("No data found in file");
+    return false;
+  }
+  
+  // Check if the first sheet has the expected columns
+  const firstsheet = data[0];
+  console.log("First sheet of imported data:", firstsheet);
+  
+  const expectedColumns = [
+      'National ID', 'Gender', 'First Name', 'Father Name', 
+      'Grandfather Name', 'Last Name', 'Phone Number', 'Date Of Birth',
+      'Region', 'Area', 'Institute', 'Profession', 'Status', 'Marks',
+      'How did he hear about us?'
+    ];
+  
+  // Check for required fields
+  const missingColumns = expectedColumns.filter(column => !firstsheet.hasOwnProperty(column));
+  
+  if (missingColumns.length > 0) {
+    console.log("Missing columns in imported data:", missingColumns);
+    return false;
+  }
+  
+  return true;
+};
 
   if (loading) {
     return (
@@ -255,6 +411,20 @@ export default function AdminDashboardPage() {
           <button className="button exportButton" onClick={exportToCSV}>
              تصدير إلى Excel
           </button>
+          <button 
+            className="button importButton" 
+            onClick={handleImportClick}
+            disabled={importLoading}
+          >
+            {importLoading ? "جاري الاستيراد..." : "📥 استيراد من Excel"}
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept=".xlsx, .xls, .csv"
+            style={{ display: 'none' }}
+          />
           <button
             className="button logoutButton"
             onClick={handleLogout}
@@ -263,6 +433,18 @@ export default function AdminDashboardPage() {
           </button>
         </div>
       </div>
+
+      {importError && (
+        <div className="importError">
+          <p>{importError}</p>
+        </div>
+      )}
+      {importSuccess && (
+        <div className="importSuccess">
+          <p>{importSuccess}</p>
+        </div>
+      )}
+
 
       <div className="statsCard">
         <div className="statsInfo">

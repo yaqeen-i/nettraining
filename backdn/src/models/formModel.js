@@ -83,7 +83,25 @@ const UserForm = sequelize.define("UserForm", {
     allowNull: false,
     validate: {
       isDate: true,
-      isBefore: new Date().toISOString().split('T')[0]
+      isBefore: new Date().toISOString().split('T')[0],
+
+      isWithinAgeRange(value) {
+        const today = new Date();
+        const birthDate = new Date(value);
+        
+        // age cal`culation
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        // age adjustment if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        
+        if (age < 17 || age > 35) {
+          throw new Error('Applicant must be between 17 and 35 years old');
+        }
+      }
     }
   },
   gender: {
