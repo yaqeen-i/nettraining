@@ -12,6 +12,7 @@ router.use(authenticateAdmin);
 
 router.get("/", formController.getForms);
 router.get("/:id", adminController.getAdminById);
+router.delete("/:id", adminController.deleteAdmin);
 //router.put("/:id", formController.putForm); // Admin can update a specific form
 
 

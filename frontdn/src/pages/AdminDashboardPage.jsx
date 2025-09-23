@@ -117,6 +117,30 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Add this function to your AdminDashboardPage component
+const handleDelete = async (formId) => {
+  try {
+    await formApi.deleteForm(formId);
+    
+    // Remove the deleted form from state
+    const updatedForms = forms.filter(form => form.id !== formId);
+    setForms(updatedForms);
+    
+    // Also update filtered forms
+    const updatedFilteredForms = filteredForms.filter(form => form.id !== formId);
+    setFilteredForms(updatedFilteredForms);
+    
+    // Show success message
+    setImportSuccess('تم حذف النموذج بنجاح');
+  } catch (error) {
+    console.error('Error deleting form:', error);
+    setImportError(error.response?.data?.error || 'فشل في حذف النموذج');
+  }
+};
+
+// Update the FormTable component usage
+<FormTable forms={filteredForms} onEdit={handleEdit} onDelete={handleDelete} />
+
   const handleRefresh = () => {
     setRefreshCount(prev => prev + 1);
     setSearchTerm(""); 
@@ -416,7 +440,7 @@ const convertExcelDate = (excelDate) => {
             onClick={handleImportClick}
             disabled={importLoading}
           >
-            {importLoading ? "جاري الاستيراد..." : "📥 استيراد من Excel"}
+            {importLoading ? "جاري الاستيراد..." : " استيراد من Excel"}
           </button>
           <input
             type="file"
@@ -489,7 +513,7 @@ const convertExcelDate = (excelDate) => {
           )}
         </div>
       ) : (
-        <FormTable forms={filteredForms} onEdit={handleEdit} />
+        <FormTable forms={filteredForms} onEdit={handleEdit} onDelete={handleDelete} />
       )}
     </div>
   );

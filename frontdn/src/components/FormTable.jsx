@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import FormEditModal from "./FormEditModal";
 import "../styles/FormTable.css";
 
-export default function FormTable({ forms, onEdit }) {
+export default function FormTable({ forms, onEdit, onDelete }) {
   const [selectedForm, setSelectedForm] = useState(null);
+  const [formToDelete, setFormToDelete] = useState(null);
 
   const handleEditClick = (form) => {
     setSelectedForm(form);
+  };
+
+  const handleDeleteClick = (form) => {
+    setFormToDelete(form);
   };
 
   const handleCloseModal = () => setSelectedForm(null);
@@ -16,14 +21,26 @@ export default function FormTable({ forms, onEdit }) {
     setSelectedForm(null);
   };
 
+  const confirmDelete = async () => {
+    if (formToDelete) {
+      await onDelete(formToDelete.id);
+      setFormToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setFormToDelete(null);
+  };
+
+  // Function to get status class for td element
   const getStatusClass = (status) => {
     switch (status) {
       case 'ACCEPTED':
-        return 'status-badge accepted';
+        return 'status-cell accepted';
       case 'REJECTED':
-        return 'status-badge rejected';
+        return 'status-cell rejected';
       default:
-        return 'status-badge pending';
+        return 'status-cell pending';
     }
   };
 
@@ -66,32 +83,38 @@ export default function FormTable({ forms, onEdit }) {
             <tr key={`${form.id}-${form.nationalID}-${form.phoneNumber}`}>
               <td>{form.nationalID}</td>
               <td>{form.gender}</td>
+              <td>{form.firstName}</td>
               <td>{form.fatherName}</td>
               <td>{form.grandFatherName}</td>
               <td>{form.lastName}</td>
               <td>{form.firstName}</td>
               <td>{form.phoneNumber}</td>
-              <td>{form.educationLevel}</td>
-              <td>{new Date(form.dateOfBirth).toISOString().split("T")[0]}</td>
+              <td>{new Date(form.dateOfBirth).toLocaleDateString("en-GB")}</td>
               <td>{form.region}</td>
               <td>{form.area}</td>
               <td>{form.institute}</td>
               <td>{form.residence}</td>
               <td>{form.profession}</td>
-             <td>
-                <span className={getStatusClass(form.status)}>
-                  {form.status || 'PENDING'}
-                </span>
-              </td>
-              <td>{form.mark}</td>
               <td>{form.howDidYouHearAboutUs}</td>
+              <td className={getStatusClass(form.status)}>
+                {form.status || 'PENDING'}
+              </td>
+              <td>{form.mark || '-'}</td>
               <td>
-                <button
-                  className="form-action-button"
-                  onClick={() => handleEditClick(form)}
-                >
-                  Edit
-                </button>
+                <div className="action-buttons">
+                  <button
+                    className="form-action-button edit-button"
+                    onClick={() => handleEditClick(form)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="form-action-button delete-button"
+                    onClick={() => handleDeleteClick(form)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -104,6 +127,32 @@ export default function FormTable({ forms, onEdit }) {
           onClose={handleCloseModal}
           onSave={handleSave}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {formToDelete && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Confirm Delete</h3>
+              <button className="close-button" onClick={cancelDelete}>
+                &times;
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete the application form for {formToDelete.firstName} {formToDelete.lastName} (National ID: {formToDelete.nationalID})?</p>
+              <p>This action cannot be undone.</p>
+            </div>
+            <div className="modal-actions">
+              <button className="cancel-button" onClick={cancelDelete}>
+                Cancel
+              </button>
+              <button className="delete-confirm-button" onClick={confirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -258,3 +258,21 @@ exports.importForms = async (req, res) => {
     res.status(500).json({ error: 'فشل في استيراد البيانات' });
   }
 };
+
+exports.deleteForm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedRowsCount = await UserForm.destroy({
+      where: { id: id }
+    });
+    
+    if (deletedRowsCount === 0) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    
+    res.json({ message: 'Form deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting form:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

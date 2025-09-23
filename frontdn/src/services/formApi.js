@@ -23,6 +23,7 @@ formApi.getFormById = (id) => formApi.get(`/forms/${id}`);
 formApi.createForm = (data) => formApi.post("/forms", data);
 formApi.updateForm = (id, data) => formApi.put(`/forms/${id}`, data);
 formApi.importForms = (data) => formApi.post("/forms/import", data);
+formApi.deleteForm = (id) => formApi.delete(`/forms/${id}`);
 
 formApi.getRegions = () => formApi.get("/api/regions");
 formApi.getAreas = (region) => formApi.get(`/api/areas?region=${encodeURIComponent(region)}`);

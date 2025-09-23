@@ -108,4 +108,19 @@ const handleLogout = async () => {
       res.json({ message: "Logout successful" });
     }
 
-    
+exports.deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedRowsCount = await Admin.destroy({ where: { id } });
+    if (deletedRowsCount === 0) {
+      return res.status(404).json({ error: "Admin not found" });
+    }
+    res.json({ message: "Admin deleted successfully" });
+  } catch (err) {
+    console.error("Error in deleteAdmin:", err);
+    if (err.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({ error: "Cannot delete admin with existing dependencies" });
+    }
+    res.status(500).json({ error: err.message , errDetails: err.errors });
+  }
+};
