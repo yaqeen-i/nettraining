@@ -19,7 +19,21 @@ export default function AdminDashboardPage() {
   const [importError, setImportError] = useState(null);
   const [importSuccess, setImportSuccess] = useState(null);
   const fileInputRef = useRef(null);
+  const [regionFilter, setRegionFilter] = useState("");
+  const [areaFilter, setAreaFilter] = useState("");
+  const [instituteFilter, setInstituteFilter] = useState("");
+  const [professionFilter, setProfessionFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
+  // Available options for cascading filters
+  const [regions, setRegions] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [institutes, setInstitutes] = useState([]);
+  const [professions, setProfessions] = useState([]);
+  const [filterLoading, setFilterLoading] = useState(false);
+
+  // Get unique statuses from current data
+  const uniqueStatuses = [...new Set(forms.map(form => form.status || 'PENDING'))].filter(Boolean).sort();
 
   useEffect(() => {
     
@@ -44,6 +58,96 @@ export default function AdminDashboardPage() {
 
     fetchAdminDetails();
   }, []);
+
+  // Fetch regions for filters
+  useEffect(() => {
+    const fetchRegions = async () => {
+      setFilterLoading(true);
+      try {
+        const response = await formApi.getRegions();
+        setRegions(response.data);
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+      } finally {
+        setFilterLoading(false);
+      }
+    };
+    fetchRegions();
+  }, []);
+
+  // Fetch areas when region changes
+  useEffect(() => {
+    if (regionFilter) {
+      const fetchAreas = async () => {
+        setFilterLoading(true);
+        try {
+          const response = await formApi.getAreas(regionFilter);
+          setAreas(response.data);
+          // Reset dependent filters
+          setAreaFilter("");
+          setInstituteFilter("");
+          setProfessionFilter("");
+        } catch (error) {
+          console.error("Error fetching areas:", error);
+        } finally {
+          setFilterLoading(false);
+        }
+      };
+      fetchAreas();
+    } else {
+      setAreas([]);
+      setAreaFilter("");
+      setInstituteFilter("");
+      setProfessionFilter("");
+    }
+  }, [regionFilter]);
+
+  // Fetch institutes when area changes
+  useEffect(() => {
+    if (areaFilter && regionFilter) {
+      const fetchInstitutes = async () => {
+        setFilterLoading(true);
+        try {
+          const response = await formApi.getInstitutes(regionFilter, areaFilter);
+          setInstitutes(response.data);
+          // Reset dependent filters
+          setInstituteFilter("");
+          setProfessionFilter("");
+        } catch (error) {
+          console.error("Error fetching institutes:", error);
+        } finally {
+          setFilterLoading(false);
+        }
+      };
+      fetchInstitutes();
+    } else {
+      setInstitutes([]);
+      setInstituteFilter("");
+      setProfessionFilter("");
+    }
+  }, [areaFilter, regionFilter]);
+
+  // Fetch professions when institute changes
+  useEffect(() => {
+    if (instituteFilter && areaFilter && regionFilter) {
+      const fetchProfessions = async () => {
+        setFilterLoading(true);
+        try {
+          const response = await formApi.getProfessions(regionFilter, areaFilter, instituteFilter, "MALE"); // Gender not needed for filter
+          setProfessions(response.data);
+          setProfessionFilter("");
+        } catch (error) {
+          console.error("Error fetching professions:", error);
+        } finally {
+          setFilterLoading(false);
+        }
+      };
+      fetchProfessions();
+    } else {
+      setProfessions([]);
+      setProfessionFilter("");
+    }
+  }, [instituteFilter, areaFilter, regionFilter]);
 
   useEffect(() => {
     let isMounted = true;
@@ -106,6 +210,43 @@ export default function AdminDashboardPage() {
     }
   }, [searchTerm, forms]);
 
+  useEffect(() => {
+    applyFilters();
+  }, [regionFilter, areaFilter, professionFilter, statusFilter, searchTerm, forms]);
+
+  const applyFilters = () => {
+    let filtered = forms;
+
+    // Apply search filter
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter(form =>
+        form.nationalID && form.nationalID.includes(searchTerm.trim())
+      );
+    }
+
+    // Apply region filter
+    if (regionFilter) {
+      filtered = filtered.filter(form => form.region === regionFilter);
+    }
+
+    // Apply area filter
+    if (areaFilter) {
+      filtered = filtered.filter(form => form.area === areaFilter);
+    }
+
+    // Apply profession filter
+    if (professionFilter) {
+      filtered = filtered.filter(form => form.profession === professionFilter);
+    }
+
+    // Apply status filter
+    if (statusFilter) {
+      filtered = filtered.filter(form => (form.status || 'PENDING') === statusFilter);
+    }
+
+    setFilteredForms(filtered);
+  };
+
   const handleEdit = updatedForm => {
     const updatedForms = forms.map(f => (f.id === updatedForm.id ? updatedForm : f));
     setForms(updatedForms);
@@ -138,7 +279,15 @@ const handleDelete = async (formId) => {
   }
 };
 
-// Update the FormTable component usage
+  const clearFilters = () => {
+    setSearchTerm("");
+    setRegionFilter("");
+    setAreaFilter("");
+    setProfessionFilter("");
+    setStatusFilter("");
+  };
+
+  // Update the FormTable component usage
 <FormTable forms={filteredForms} onEdit={handleEdit} onDelete={handleDelete} />
 
   const handleRefresh = () => {
@@ -474,8 +623,16 @@ const convertExcelDate = (excelDate) => {
         <div className="statsInfo">
           <p className="statsNumber">{filteredForms.length}</p>
           <p className="statsLabel">
-            {searchTerm ? "النماذج المصفاة" : "إجمالي نماذج التقديم"}
-            {searchTerm && ` (بحث: ${searchTerm})`}
+            {filteredForms.length !== forms.length ? "النماذج المصفاة" : "إجمالي نماذج التقديم"}
+            {(regionFilter || areaFilter || professionFilter || statusFilter || searchTerm) && 
+              ` (مطبق ${[
+                searchTerm && 'بحث',
+                regionFilter && 'إقليم',
+                areaFilter && 'منطقة', 
+                professionFilter && 'حرفة',
+                statusFilter && 'حالة'
+              ].filter(Boolean).join('، ')})`
+            }
           </p>
         </div>
 
@@ -498,13 +655,99 @@ const convertExcelDate = (excelDate) => {
         </div>
       </div>
 
+      {/* Cascading Filters Section */}
+      <div className="filters-section">
+        <h3>تصفية النتائج</h3>
+        <div className="filters-grid cascading-filters">
+          <div className="filter-group">
+            <label>الإقليم:</label>
+            <select 
+              value={regionFilter} 
+              onChange={(e) => setRegionFilter(e.target.value)}
+              disabled={filterLoading}
+              className="select"
+            >
+              <option value="">جميع الأقاليم</option>
+              {regions.map(region => (
+                <option key={region} value={region}>{region}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>المنطقة:</label>
+            <select 
+              value={areaFilter} 
+              onChange={(e) => setAreaFilter(e.target.value)}
+              disabled={!regionFilter || filterLoading}
+              className="select"
+            >
+              <option value="">جميع المناطق</option>
+              {areas.map(area => (
+                <option key={area} value={area}>{area}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>المعهد:</label>
+            <select 
+              value={instituteFilter} 
+              onChange={(e) => setInstituteFilter(e.target.value)}
+              disabled={!areaFilter || filterLoading}
+              className="select"
+            >
+              <option value="">جميع المعاهد</option>
+              {institutes.map(institute => (
+                <option key={institute} value={institute}>{institute}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>الحرفة:</label>
+            <select 
+              value={professionFilter} 
+              onChange={(e) => setProfessionFilter(e.target.value)}
+              disabled={!instituteFilter || filterLoading}
+              className="select"
+            >
+              <option value="">جميع الحرف</option>
+              {professions.map(profession => (
+                <option key={profession} value={profession}>{profession}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>الحالة:</label>
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="select"
+            >
+              <option value="">جميع الحالات</option>
+              {uniqueStatuses.map(status => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-actions">
+            <button className="button clear-filters-button" onClick={clearFilters}>
+              مسح جميع الفلاتر
+            </button>
+          </div>
+        </div>
+      </div>
+
       {filteredForms.length === 0 ? (
         <div className="noResults">
-          {searchTerm ? (
+          {searchTerm || regionFilter || areaFilter || instituteFilter || professionFilter || statusFilter ? (
             <>
               <h3>لم يتم العثور على نماذج</h3>
-              <p>لا توجد نماذج تطابق الرقم الوطني: {searchTerm}</p>
-              <button className="button" onClick={clearSearch}>
+              <p>لا توجد نماذج تطابق معايير البحث والتصفية المحددة</p>
+              <button className="button" onClick={clearFilters}>
                 عرض جميع النماذج
               </button>
             </>

@@ -34,16 +34,39 @@ export default function FormTable({ forms, onEdit, onDelete }) {
 
   // Function to get status class for td element
   const getStatusClass = (status) => {
+    const sb = "status-badge";
     switch (status) {
       case 'ACCEPTED':
-        return 'status-cell accepted';
+        return `${sb} accepted`;
       case 'REJECTED':
-        return 'status-cell rejected';
+        return `${sb} rejected`;
+      case 'PHONE_CALL':
+        return `${sb} phone-call`;
+      case 'PASSED_THE_EXAM':
+        return `${sb} passed-the-exam`;
+      case 'WAITING_FOR_DOCUMENTS':
+        return `${sb} waiting-for-documents`;
       default:
-        return 'status-cell pending';
+        return 'status-badge pending';
     }
   };
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'مقبول (الخطوة النهائية) \n';
+      case 'REJECTED':
+        return 'مرفوض';
+      case 'PHONE_CALL':
+        return 'مكالمة هاتفية (الخطوة الثانية)';
+      case 'PASSED_THE_EXAM':
+        return 'اجتاز الامتحان (الخطوة الثالثة)';
+      case 'WAITING_FOR_DOCUMENTS':
+        return 'في انتظار المستندات (الخطوة الرابعة)';
+      default:
+        return 'الخطوة الاولى (في الانتظار)';
+    }
+  }
   return (
     <div className="form-table-container">
       <div className="form-table-header">
@@ -57,9 +80,9 @@ export default function FormTable({ forms, onEdit, onDelete }) {
             {[
               "National ID",
               "Gender",
-              "Father Name",
-              "Grandfather Name",
               "Last Name",
+              "Grandfather Name",
+              "Father Name",
               "First Name", 
               "Phone Number",
               "Education Level", 
@@ -71,6 +94,7 @@ export default function FormTable({ forms, onEdit, onDelete }) {
               "Profession",
               "Status",
               "Marks",
+              "Required Documents",
               "How did he hear about us?",
               "Actions",
             ].map((header, index) => (
@@ -83,23 +107,27 @@ export default function FormTable({ forms, onEdit, onDelete }) {
             <tr key={`${form.id}-${form.nationalID}-${form.phoneNumber}`}>
               <td>{form.nationalID}</td>
               <td>{form.gender}</td>
-              <td>{form.firstName}</td>
-              <td>{form.fatherName}</td>
-              <td>{form.grandFatherName}</td>
               <td>{form.lastName}</td>
+              <td>{form.grandFatherName}</td>
+              <td>{form.fatherName}</td>
               <td>{form.firstName}</td>
               <td>{form.phoneNumber}</td>
-              <td>{new Date(form.dateOfBirth).toLocaleDateString("en-GB")}</td>
+              <td>{form.educationLevel}</td>
+              <td>{new Date(form.dateOfBirth).toISOString().split("T")[0] }</td>
               <td>{form.region}</td>
               <td>{form.area}</td>
               <td>{form.institute}</td>
               <td>{form.residence}</td>
               <td>{form.profession}</td>
-              <td>{form.howDidYouHearAboutUs}</td>
-              <td className={getStatusClass(form.status)}>
-                {form.status || 'PENDING'}
+              <td>
+                <span className={getStatusClass(form.status)}>
+                  {form.status} - {getStatusText(form.status)} 
+                </span>
               </td>
-              <td>{form.mark || '-'}</td>
+              <td>{form.mark}</td>
+              <td>{form.requiredDocuments}</td>
+              <td>{form.howDidYouHearAboutUs}</td>
+              
               <td>
                 <div className="action-buttons">
                   <button

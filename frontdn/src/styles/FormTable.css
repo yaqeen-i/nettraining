@@ -63,15 +63,32 @@
 
 .status-badge.pending {
   background-color: #fff700;
-  color : #333;
+  color : #000000;
+}
+
+.status-badge.phone-call {
+  background-color: #1E90FF; 
+  color: #ffffff;
+}
+
+.status-badge.passed-the-exam {
+  background-color: #32CD32; 
+  color: #ffffff;
+}
+
+.status-badge.waiting-for-documents {
+  background-color: #FFA500; 
+  color: #ffffff;
 }
 
 .status-badge.accepted {
   background-color: #228B22; 
+  color: #ffffff;
 }
 
 .status-badge.rejected {
-  background-color: #B22222; 
+  background-color: #B22222;
+  color: #ffffff; 
 }
 
 .form-table td {
@@ -114,15 +131,6 @@
   gap: 8px;
 }
 
-/* Edit and Delete button styles */
-.form-action-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: background-color 0.3s;
-}
 
 .edit-button {
   background-color: #007bff;

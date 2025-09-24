@@ -17,7 +17,7 @@ sequelize.authenticate()
     await Area.sync({ force: false });
     await Institute.sync({ force: false });
     await Profession.sync({ force: false });
-    await UserForm.sync({ force: false , alter: true }); // alter true to update existing tables without dropping data
+    await UserForm.sync({ force: false }); // alter true to update existing tables without dropping data
     await Admin.sync({ force: false });
     
     console.log("Database synced successfully");

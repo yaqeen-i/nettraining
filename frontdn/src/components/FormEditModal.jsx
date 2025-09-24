@@ -42,29 +42,30 @@ export default function FormEditModal({ form, onClose, onSave }) {
     try {
       const updateData = {
         nationalID: formData.nationalID,
-        phoneNumber: formData.phoneNumber,
-        firstName: formData.firstName,
-        fatherName: formData.fatherName,
-        grandFatherName: formData.grandFatherName,
-        lastName: formData.lastName,
-        dateOfBirth: formData.dateOfBirth,
         gender: formData.gender,
+        lastName: formData.lastName,
+        grandFatherName: formData.grandFatherName,
+        fatherName: formData.fatherName,
+        firstName: formData.firstName,
+        phoneNumber: formData.phoneNumber,
         educationLevel: formData.educationLevel,
-        residence: formData.residence,
-        howDidYouHearAboutUs: formData.howDidYouHearAboutUs,
+        dateOfBirth: formData.dateOfBirth,
         region: formData.region,
         area: formData.area,
         institute: formData.institute,
         profession: formData.profession,
+        residence: formData.residence,
         status: formData.status,
-        mark: formData.mark
+        marks: formData.mark,
+        requiredDocuments: formData.requiredDocuments,
+        howDidYouHearAboutUs: formData.howDidYouHearAboutUs,
       };
 
       const { data } = await formApi.updateForm(form.id, updateData);
       onSave(data);
       window.location.reload();
     } catch (err) {
-      console.error(err);
+      console.error("Error updating form:", err);
       setError(err.response?.data?.error || "Failed to update form");
     } finally {
       setLoading(false);
@@ -211,12 +212,15 @@ export default function FormEditModal({ form, onClose, onSave }) {
               onChange={handleChange}
               className="modal-select"
             >
-              <option value="PENDING">Pending</option>
+              <option value="PENDING">Pending - الخطوة الاولى (في الانتظار)</option>
+              <option value="PHONE_CALL">Phone Call</option>
+              <option value="PASSED_THE_EXAM">Passed the Exam </option>
+              <option value="WAITING_FOR_DOCUMENTS">Waiting For Documents</option>
               <option value="ACCEPTED">Accepted</option>
               <option value="REJECTED">Rejected</option>
             </select>
 
-            <label>Mark (0-100):</label>
+            <label>العلامة (0-100):</label>
             <input
               type="number"
               name="mark"
@@ -227,6 +231,20 @@ export default function FormEditModal({ form, onClose, onSave }) {
               placeholder="Enter mark"
               className="modal-input"
             />
+
+          <label> هل تم تسليم الملفات الخاصة بالطالب؟</label>
+          <select 
+            name="requiredDocuments" 
+            value={formData.requiredDocuments}
+            onChange={handleChange}
+            className="modal-select"
+            >
+              <option value="YES"> YES / نعم </option>
+              <option value="NO"> NO / لا </option>
+              {/* there should be an endpoint and also an interface where the student can upload the required documents
+  should be implemented where the documents can be stored in a cloud storage like AWS S3 
+ */}
+          </select>
             
           <label>كيف سمعت عنا؟</label>
           <select

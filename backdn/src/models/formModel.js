@@ -85,23 +85,23 @@ const UserForm = sequelize.define("UserForm", {
       isDate: true,
       isBefore: new Date().toISOString().split('T')[0],
 
-      // isWithinAgeRange(value) {
-      //   const today = new Date();
-      //   const birthDate = new Date(value);
+      isWithinAgeRange(value) {
+        const today = new Date();
+        const birthDate = new Date(value);
         
-      //   // age cal`culation
-      //   let age = today.getFullYear() - birthDate.getFullYear();
-      //   const monthDiff = today.getMonth() - birthDate.getMonth();
+        // age calculation
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
         
-      //   // age adjustment if birthday hasn't occurred yet this year
-      //   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      //     age--;
-      //   }
+        // age adjustment if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
         
-      //   if (age < 17 || age > 35) {
-      //     throw new Error('Applicant must be between 17 and 35 years old');
-      //   }
-      // }
+        if (age < 17 || age > 35) {
+          throw new Error('Applicant must be between 17 and 35 years old');
+        }
+      }
     }
   },
   gender: {
@@ -139,11 +139,11 @@ const UserForm = sequelize.define("UserForm", {
     }
   },
   status: {
-    type: DataTypes.STRING(20),
+    type: DataTypes.STRING(21),
     allowNull: false,
     defaultValue: 'PENDING',
     validate: {
-      isIn: [['PENDING', 'ACCEPTED', 'REJECTED']]
+      isIn: [['PENDING', 'PHONE_CALL', 'PASSED_THE_EXAM', 'WAITING_FOR_DOCUMENTS', 'ACCEPTED', 'REJECTED']]
     },
     set(value) {
       this.setDataValue('status', value.toUpperCase());
@@ -156,6 +156,11 @@ const UserForm = sequelize.define("UserForm", {
       min: 0,
       max: 100
     }
+  },
+  requiredDocuments: {
+    type: DataTypes.STRING(3),
+    allowNull: true,
+    defaultValue: 'NO',
   }
 },
  {
