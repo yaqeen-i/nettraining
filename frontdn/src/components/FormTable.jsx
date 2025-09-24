@@ -121,7 +121,7 @@ export default function FormTable({ forms, onEdit, onDelete }) {
               <td>{form.profession}</td>
               <td>
                 <span className={getStatusClass(form.status)}>
-                  {form.status} - {getStatusText(form.status)} 
+                  {form.status}<br />{getStatusText(form.status)} 
                 </span>
               </td>
               <td>{form.mark}</td>
