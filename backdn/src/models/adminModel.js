@@ -10,7 +10,8 @@ const admin = sequelize.define("admin", {
   username: {
     type: DataTypes.STRING(50),
     allowNull: false,
-    unique: true
+    unique: true,
+    collate: "utf8mb4_bin"
   },
   email: {
     type: DataTypes.STRING(100),
