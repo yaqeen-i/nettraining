@@ -309,72 +309,55 @@ const handleDelete = async (formId) => {
   };
 
   
-  const exportToCSV = () => {
-    if (filteredForms.length === 0) {
-      alert("لا توجد بيانات للتصدير");
-      return;
-    }
+  const exportToExcel = () => {
+  if (!filteredForms || filteredForms.length === 0) {
+    alert("لا توجد بيانات للتصدير");
+    return;
+  }
 
-    // define CSV headers
-    const headers = [
-      "National ID",
-      "Gender",
-      "First Name",
-      "Father Name",
-      "Grandfather Name",
-      "Last Name",
-      "Phone Number",
-      "Education Level",
-      "Date of Birth",
-      "Region",
-      "Area",
-      "Institute",
-      "Residence",
-      "Profession",
-      "Status",
-      "Marks",
-      "How did he hear about us?"
-    ];
+  // map forms to match table column order
+  const exportData = filteredForms.map(form => ({
+    "National ID": form.nationalID ? String(form.nationalID) : "",
+    "Gender": form.gender ,
+    "Last Name": form.lastName ,
+    "Grandfather Name": form.grandFatherName,
+    "Father Name": form.fatherName ,
+    "First Name": form.firstName,
+    "Phone Number": form.phoneNumber ? String(form.phoneNumber) : "",
+    "Education Level": form.educationLevel ,
+    "Date of Birth": form.dateOfBirth ? new Date(form.dateOfBirth).toISOString().split("T")[0] : "",
+    "Region": form.region ,
+    "Area": form.area || "No cell present-log statement",
+    "Institute": form.institute ,
+    "Residence": form.residence ,
+    "Profession": form.profession ,
+    "Status": form.status || "PENDING",
+    "Marks": form.mark ,
+    "Required Documents": form.requiredDocuments,
+    "How did he hear about us?": form.howDidYouHearAboutUs
+  }));
 
-    // convert data to CSV format
-    const csvData = filteredForms.map(form => {
-      return [
-        form.nationalID || "",
-        form.gender || "",
-        form.firstName || "",
-        form.fatherName || "",
-        form.grandFatherName || "",
-        form.lastName || "",
-        form.phoneNumber || "",
-        form.educationLevel || "",
-        form.dateOfBirth ? new Date(form.dateOfBirth).toLocaleDateString("en-GB") : "",
-        form.region || "",
-        form.area || "",
-        form.institute || "",
-        form.residence || "",
-        form.profession || "",
-        form.status || "PENDING",
-        form.mark || "",
-        form.howDidYouHearAboutUs || ""
-      ];
+  // create worksheet and workbook to export
+  const worksheet = XLSX.utils.json_to_sheet(exportData, { cellDates: true });
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Applicants");
+
+  /* set phone numbers and IDs as text so there won't be no problems with
+   importing the same excel files back like phone numbers losing leading zeros due 
+   default number format in excel for plain numbers - same goes for the nationalID
+  */
+  exportData.forEach((_, i) => {
+    ["A", "G"].forEach(col => { // A = National ID, A: is national id column in the excel file
+    // G = Phone Number, G: is phone number column in the excel file
+      const cell = worksheet[`${col}${i + 2}`]; // +2 because headers occupy row 1
+      if (cell) cell.z = "@"; // excel text format
     });
+  });
 
-    // combine headers and data
-    const csvContent = [headers, ...csvData]
-      .map(sheet => sheet.map(field => `"${field}"`).join(","))
-      .join("\n");
+  // Save file
+  XLSX.writeFile(workbook, `applicants_${new Date().toISOString().split("T")[0]}.xlsx`);
+};
 
-    // for download link creation download link
-    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `applicants_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   const handleImportClick = () => {
     fileInputRef.current.click();
@@ -507,7 +490,7 @@ const convertExcelDate = (excelDate) => {
   const expectedColumns = [
       'National ID', 'Gender', 'First Name', 'Father Name', 
       'Grandfather Name', 'Last Name', 'Phone Number', 'Date Of Birth',
-      'Region', 'Area', 'Institute', 'Profession', 'Status', 'Marks',
+      'Region', 'Area', 'Institute', 'Profession', 'Status', 'Marks', 'Required Documents',
       'How did he hear about us?'
     ];
   
