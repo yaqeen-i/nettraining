@@ -564,7 +564,7 @@ const convertExcelDate = (excelDate) => {
           <button className="button" onClick={handleRefresh}>
             ↻ تحديث
           </button>
-          <button className="button exportButton" onClick={exportToCSV}>
+          <button className="button exportButton" onClick={exportToExcel}>
              تصدير إلى Excel
           </button>
           <button 

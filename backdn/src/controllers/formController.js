@@ -81,10 +81,11 @@ exports.createForm = async (req, res) => {
       || !lastName || !dateOfBirth || !gender || !educationLevel
       || !residence || !howDidYouHearAboutUs ){
         console.log("Missing required fields:", req.body);
-        return res.status(400).json({ 
+        return res.status(409).json({ 
           error: "Missing required fields",
           received: req.body,
-          errDetails: err.errors
+          // errDetails: err.errors,
+          // err: "Missing required fields"
         });
       }  
     
@@ -99,7 +100,7 @@ exports.createForm = async (req, res) => {
     });
     
     if (existingForm) {
-      console.log("Duplicate form found:", existingForm.toJSON());
+      //console.log("Duplicate form found:", existingForm.toJSON()); // uncomment for debugging
       return res.status(409).json({ 
         error: "A form with this National ID or Phone Number already exists" 
       });
@@ -137,7 +138,7 @@ exports.createForm = async (req, res) => {
                                         residence,
                                         howDidYouHearAboutUs }); 
                                         
-    console.log("Form created successfully:", newForm.toJSON());
+    //console.log("Form created successfully:", newForm.toJSON()); // uncomment for debugging
     
     res.status(201).json(newForm);
   } catch (err) {
@@ -150,7 +151,7 @@ exports.createForm = async (req, res) => {
       });
     }
     
-    res.status(400).json({ error: err.message, details: err.errors });
+    res.status(409).json({ error: err.message, details: err.errors });
   }
 };
 
