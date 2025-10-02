@@ -11,7 +11,13 @@ const admin = sequelize.define("admin", {
     type: DataTypes.STRING(50),
     allowNull: false,
     unique: true,
-    collate: "utf8mb4_bin"
+    collate: "utf8mb4_bin",
+    validate: {
+      len: {
+        args: [3, 50],
+        msg: "Username must be between 3 and 50 characters"
+      }
+    }
   },
   email: {
     type: DataTypes.STRING(100),
@@ -23,7 +29,13 @@ const admin = sequelize.define("admin", {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      len: {
+        args: [6, 100],
+        msg: "Password must be at least 6 characters"
+      }
+    }
   }
 }, {
   timestamps: true,

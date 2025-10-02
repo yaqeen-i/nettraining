@@ -64,19 +64,59 @@ const UserForm = sequelize.define("UserForm", {
   },
   firstName: {
     type: DataTypes.STRING(15),
-    allowNull: false
+    allowNull: false,
+    validate: {
+    len: {
+      args: [2, 15],
+      msg: "Last name must be between 2 and 15 characters"
+    },
+    is: {
+      args: /^[A-Za-z\u0600-\u06FF]+$/,
+      msg: "Last name can only contain letters"
+    }
+  }
   },
   fatherName: {
     type: DataTypes.STRING(15),
-    allowNull: false
+    allowNull: false,
+    validate: {
+      len: {
+        args: [2, 15],
+        msg: "Father name must be between 2 and 15 characters"
+      },
+      is: {
+        args: /^[A-Za-z\u0600-\u06FF]+$/,
+        msg: "Father name can only contain letters"
+      }
+    }
   },
   grandFatherName: {
     type: DataTypes.STRING(15),
-    allowNull: false
+    allowNull: false,
+    validate: {
+      len: {
+        args: [2, 15],
+        msg: "Grandfather name must be between 2 and 15 characters"
+      },
+      is: {
+        args: /^[A-Za-z\u0600-\u06FF]+$/,
+        msg: "Grandfather name can only contain letters"
+      }
+    }
   },
   lastName: {
     type: DataTypes.STRING(15),
-    allowNull: false
+    allowNull: false,
+    validate: {
+      len: {
+        args: [2, 15],
+        msg: "Last name must be between 2 and 15 characters"
+      },
+      is: {
+        args: /^[A-Za-z\u0600-\u06FF]+$/,
+        msg: "Last name can only contain letters"
+      }
+    }
   },
   dateOfBirth: {
     type: DataTypes.DATEONLY,
@@ -98,9 +138,19 @@ const UserForm = sequelize.define("UserForm", {
           age--;
         }
         
+        const gender = this.gender?.toUpperCase();
+
+      if (gender === "FEMALE") {
         if (age < 17 || age > 35) {
-          throw new Error('Applicant must be between 17 and 35 years old');
+          throw new Error("Female applicants must be between 17 and 35 years old");
         }
+      } else if (gender === "MALE") {
+        if (age < 17 || age > 30) {
+          throw new Error("Male applicants must be between 17 and 30 years old");
+        }
+      } else {
+        throw new Error("Gender must be specified for age validation");
+      }
       }
     }
   },
@@ -126,7 +176,13 @@ const UserForm = sequelize.define("UserForm", {
   },
   residence: {
     type: DataTypes.STRING(100),
-    allowNull: false
+    allowNull: false,
+    validate: {
+      len: {
+        args: [10, 100],
+        msg: "Residence must be between 5 and 100 characters"
+      }
+    }
   },
   howDidYouHearAboutUs: {
     type: DataTypes.STRING(100),

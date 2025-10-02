@@ -4,12 +4,12 @@ const adminController = require("../controllers/adminController");
 const formController = require("../controllers/formController");
 const { authenticateAdmin } = require("../middleware/authMiddleware");
 
-router.post("/register", adminController.registerAdmin);
+
 router.post("/login", adminController.loginAdmin);
 
 router.use(authenticateAdmin);
 //protected routes
-
+router.post("/register", adminController.registerAdmin);
 router.get("/", formController.getForms);
 router.get("/:id", adminController.getAdminById);
 router.delete("/:id", adminController.deleteAdmin);

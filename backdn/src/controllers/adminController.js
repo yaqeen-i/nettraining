@@ -10,7 +10,9 @@ exports.registerAdmin = async (req, res) => {
     const salt = await bcryptjs.genSalt();
     
     const { username, email, password } = req.body;
-
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters" });
+    }
     const passwordHash = await bcryptjs.hash(password, salt);
 
     console.log("salt= "+ salt);
@@ -32,7 +34,7 @@ exports.registerAdmin = async (req, res) => {
     res.status(201).json({ message: "Admin registered successfully", admin: newAdmin });
   } catch (err) {
     console.error("Error in registerAdmin:", err);
-    res.status(500).json({ error: err.message , errDetails: err.errors });
+    res.status(400).json({ error: err.message , errDetails: err.errors });
   }
 }
 
