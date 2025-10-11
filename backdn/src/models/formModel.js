@@ -179,7 +179,7 @@ const UserForm = sequelize.define("UserForm", {
     allowNull: false,
     validate: {
       len: {
-        args: [10, 100],
+        args: [5, 100],
         msg: "Residence must be between 5 and 100 characters"
       }
     }

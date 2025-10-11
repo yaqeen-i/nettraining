@@ -1,5 +1,5 @@
 # frontdn/Dockerfile
-FROM node:18
+FROM node:20
 
 WORKDIR /app
 

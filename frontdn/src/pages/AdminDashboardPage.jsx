@@ -2,6 +2,7 @@ import React, { useEffect, useState , useRef} from "react";
 import formApi from "../services/formApi";
 import adminApi from "../services/adminApi";
 import FormTable from "../components/FormTable";
+import FloatingAIChat from "../components/floatingChat";
 import { jwtDecode } from "jwt-decode"; 
 import * as XLSX from "xlsx";
 import "../styles/AdminDashboardPage.css";
@@ -740,7 +741,9 @@ const convertExcelDate = (excelDate) => {
         </div>
       ) : (
         <FormTable forms={filteredForms} onEdit={handleEdit} onDelete={handleDelete} />
-      )}
+      )}{
+         <FloatingAIChat />
+      }
     </div>
   );
 }

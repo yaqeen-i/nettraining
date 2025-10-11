@@ -50,7 +50,7 @@ exports.getForms = async (req, res) => {
     res.json(forms);
   } catch (err) {
     console.error("Error in getForms:", err);
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -171,6 +171,11 @@ exports.putForm = async (req, res) => {
     if (!validation.valid) {
       return res.status(400).json({ error: validation.error });
     }
+
+    const existingForm = await UserForm.findByPk(id);
+    if (!existingForm) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
     
     const [updatedRowsCount, updatedRows] = await UserForm.update(formData, {
       where: { id: id },
@@ -184,7 +189,7 @@ exports.putForm = async (req, res) => {
     res.json(updatedRows[0]);
   } catch (error) {
     console.error('Error updating form:', error);
-    res.status(500).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
@@ -256,7 +261,7 @@ exports.importForms = async (req, res) => {
     });
   } catch (error) {
     console.error('Error importing forms:', error);
-    res.status(500).json({ error: 'فشل في استيراد البيانات' });
+    res.status(400).json({ error: 'فشل في استيراد البيانات' });
   }
 };
 
@@ -274,6 +279,6 @@ exports.deleteForm = async (req, res) => {
     res.json({ message: 'Form deleted successfully' });
   } catch (error) {
     console.error('Error deleting form:', error);
-    res.status(500).json({ error: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
