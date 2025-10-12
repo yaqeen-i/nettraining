@@ -3,23 +3,20 @@ const jwt = require("jsonwebtoken");
 // authenticate admin using JWT
 const authenticateAdmin = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
-  //console.log("Authorization header:", req.header("Authorization"));
-  //console.log("Extracted token:", token);
   if (!token) {
     return res.status(401).json({ error: "No token provided" });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // i attach admin ID to request object
+    // decoded contains { id } from loginAdmin
+    req.user = { id: decoded.id }; // could also store decoded.role later
     next();
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: "Token expired" });
-    }
-    console.error("Error in authenticateAdmin:", err);
-    res.status(401).json({ error: "Invalid token" });
+    console.error("JWT verification failed:", err);
+    const msg = err.name === "TokenExpiredError" ? "Token expired" : "Invalid token";
+    res.status(401).json({ error: msg });
   }
-}
+};
 
 module.exports = { authenticateAdmin };

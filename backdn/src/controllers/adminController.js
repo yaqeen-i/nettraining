@@ -20,7 +20,7 @@ exports.registerAdmin = async (req, res) => {
     // Check if the admin already exists
     const existingAdmin = await Admin.findOne({ where: { username } });
     if (existingAdmin) {
-      return res.status(400).json({ error: "Admin already exists" });
+      return res.status(409).json({ error: "Admin already exists" });
     }
 
     // Hash the password
@@ -45,13 +45,13 @@ exports.loginAdmin = async (req, res) => {
         //  admin by username
         const admin = await Admin.findOne({ where: { username } });
         if (!admin) {
-        return res.status(400).json({ error: "Invalid username or password" });
+        return res.status(401).json({ error: "Invalid username or password" });
         }
     
         // compare the provided password with the stored hashed password
         const isMatch = await bcryptjs.compare(password, admin.password);
         if (!isMatch) {
-        return res.status(400).json({ error: "Invalid username or password" });
+        return res.status(401).json({ error: "Invalid username or password" });
         }
     
         // generate a JWT token
@@ -60,7 +60,7 @@ exports.loginAdmin = async (req, res) => {
         res.json({ message: "Login successful", token });
     } catch (err) {
         console.error("Error in loginAdmin:", err);
-        res.status(500).json({ error: err.message , errDetails: err.errors});
+        res.status(400).json({ error: err.message , errDetails: err.errors});
     }
     }
 
