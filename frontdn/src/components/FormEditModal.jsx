@@ -56,7 +56,7 @@ export default function FormEditModal({ form, onClose, onSave }) {
         profession: formData.profession,
         residence: formData.residence,
         status: formData.status,
-        marks: formData.mark,
+        mark: formData.mark,
         requiredDocuments: formData.requiredDocuments,
         howDidYouHearAboutUs: formData.howDidYouHearAboutUs,
       };

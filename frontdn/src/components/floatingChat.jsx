@@ -25,7 +25,7 @@ export default function FloatingAIChat() {
       setMessages([
         {
           id: 1,
-          text: "مرحباً! أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟",
+          text: `مرحباً! 👋 أنا بوت ذكي للاستعلام عن قاعدة البيانات\n\n💡 جرب هذه الأسئلة:\n• مرحباً / كيف حالك؟\n• كم عدد الطلاب؟\n• من الطلاب اللي عمرهم أكبر من 25؟\n• كم عدد الإناث من الشمال؟\n• اعرض أسماء الطلاب`,
           isUser: false,
           timestamp: new Date(),
           type: "text"
@@ -55,33 +55,17 @@ export default function FloatingAIChat() {
       const response = await aiModelApi.sendAIMessage(inputMessage);
       console.log("AI Response:", response.data);
       
-      // Extract the answer from the response based on the provided format
+      // Extract data from the response
       const aiResponse = response.data;
       
-      let displayText = "";
-      
-      if (aiResponse.answer) {
-        displayText = aiResponse.answer;
-        
-        // If there are results, you might want to format them nicely
-        if (aiResponse.results && aiResponse.results.length > 0) {
-          // For simple count results like your example
-          if (aiResponse.results[0].total_students !== undefined) {
-            displayText += `\n\nالنتيجة: ${aiResponse.results[0].total_students}`;
-          }
-          // You can add more formatting for different types of results here
-        }
-      } else {
-        displayText = "عذراً، لم أستطع معالجة سؤالك. يرجى المحاولة مرة أخرى.";
-      }
-
       const aiMessage = {
         id: Date.now() + 1,
-        text: displayText,
+        text: aiResponse.answer || "عذراً، لم أستطع معالجة سؤالك.",
         isUser: false,
         timestamp: new Date(),
-        type: "text",
-        rawData: aiResponse // Store raw data for potential future use
+        type: "ai_response",
+        results: aiResponse.results,
+        intent: aiResponse.intent
       };
 
       setMessages(prev => [...prev, aiMessage]);
@@ -92,7 +76,7 @@ export default function FloatingAIChat() {
       
       if (error.response) {
         // Server responded with error status
-        errorMessage = `خطأ في الخادم: ${error.response.status} - ${error.response.data?.message || ''}`;
+        errorMessage = `خطأ في الخادم: ${error.response.status} - ${error.response.data?.detail || ''}`;
       } else if (error.request) {
         // Request was made but no response received
         errorMessage = "تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.";
@@ -123,7 +107,7 @@ export default function FloatingAIChat() {
     setMessages([
       {
         id: 1,
-        text: "مرحباً! أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟",
+        text: `مرحباً! 👋 أنا بوت ذكي للاستعلام عن قاعدة البيانات\n\n💡 جرب هذه الأسئلة:\n• مرحباً / كيف حالك؟\n• كم عدد الطلاب؟\n• من الطلاب اللي عمرهم أكبر من 25؟\n• كم عدد الإناث من الشمال؟\n• اعرض أسماء الطلاب`,
         isUser: false,
         timestamp: new Date(),
         type: "text"
@@ -139,6 +123,44 @@ export default function FloatingAIChat() {
         {index < text.split('\n').length - 1 && <br />}
       </span>
     ));
+  };
+
+  // Render SQL results table
+  const renderResultsTable = (results) => {
+    if (!results || results.length === 0) return null;
+
+    const keys = Object.keys(results[0]);
+    const displayResults = results.slice(0, 50); // Limit to 50 rows
+
+    return (
+      <div className="results-section">
+        <table className="result-table">
+          <thead>
+            <tr>
+              {keys.map(key => (
+                <th key={key}>{key}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {displayResults.map((row, index) => (
+              <tr key={index}>
+                {keys.map(key => (
+                  <td key={key}>
+                    {row[key] !== null ? row[key] : '-'}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {results.length > 50 && (
+          <p className="results-info">
+            عرض 50 من {results.length} نتيجة
+          </p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -157,7 +179,7 @@ export default function FloatingAIChat() {
         <div className="chat-window">
           {/* Chat Header */}
           <div className="chat-header">
-            <h3>المساعد الذكي</h3>
+            <h3>🤖 شات بوت ذكي</h3>
             <div className="chat-actions">
               <button className="clear-chat-btn" onClick={clearChat} title="مسح المحادثة">
                 🗑️
@@ -169,14 +191,20 @@ export default function FloatingAIChat() {
           </div>
 
           {/* Messages Container */}
-          <div className="messages-container">
+          <div className="chat-messages">
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`message ${message.isUser ? 'user-message' : 'ai-message'} ${message.type === 'error' ? 'error-message' : ''}`}
+                className={`message ${message.isUser ? 'user' : 'bot'} ${message.type === 'error' ? 'error' : ''}`}
               >
-                <div className="message-bubble">
-                  <p>{formatMessageText(message.text)}</p>
+                <div className="message-content">
+                  {formatMessageText(message.text)}
+                  
+
+                  
+                  {/* Show results table if available */}
+                  {message.results && renderResultsTable(message.results)}
+                  
                   <span className="message-time">
                     {message.timestamp.toLocaleTimeString('ar-EG', { 
                       hour: '2-digit', 
@@ -186,28 +214,30 @@ export default function FloatingAIChat() {
                 </div>
               </div>
             ))}
+            
+            {/* Loading indicator */}
             {loading && (
-              <div className="message ai-message">
-                <div className="message-bubble loading">
-                  <div className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
+              <div className="message bot">
+                <div className="message-content">
+                  جاري المعالجة 
+                  <span className="loading"></span>
+                  <span className="loading"></span>
+                  <span className="loading"></span>
                 </div>
               </div>
             )}
+            
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
-          <div className="chat-input-container">
-            <textarea
+          <div className="chat-input-area">
+            <input
+              type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="اكتب سؤالك هنا بالعربية..."
-              rows="1"
+              placeholder="اكتب سؤالك هنا... (مثال: كم عدد الطلاب؟)"
               className="chat-input"
               disabled={loading}
             />
@@ -215,9 +245,8 @@ export default function FloatingAIChat() {
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || loading}
               className="send-button"
-              title="إرسال"
             >
-              {loading ? "⏳" : "➤"}
+              {loading ? 'جاري المعالجة...' : 'إرسال'}
             </button>
           </div>
         </div>
