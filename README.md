@@ -2,7 +2,7 @@
 
 A full-stack web application for managing vocational training applications in Jordan. The system handles applicant registration, tracking, and management across multiple regions, institutes, and professions.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -15,9 +15,17 @@ A full-stack web application for managing vocational training applications in Jo
 - [Usage Guide](#usage-guide)
 - [AI Chatbot Integration](#ai-chatbot-integration)
 - [Testing](#testing)
+- [Database Schema](#database-schema)
+- [Security Features](#security-features)
+- [Regions & Institutes Coverage](#regions--institutes-coverage)
+- [Data Validation Rules](#data-validation-rules)
+- [Future Enhancements](#future-enhancements)
 - [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
+- [Acknowledgments](#acknowledgments)
 
-## ✨ Features
+## Features
 
 ### Admin Features
 - **Secure Authentication**: JWT-based admin login and authorization
@@ -44,7 +52,7 @@ A full-stack web application for managing vocational training applications in Jo
 - **Responsive Design**: Works on desktop and mobile devices
 - **Arabic/English Support**: Bilingual interface
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
 - **Runtime**: Node.js 20+
@@ -71,14 +79,14 @@ A full-stack web application for managing vocational training applications in Jo
 - **Chatbot**: FastAPI-based AI model (via ngrok)
 - **Natural Language Processing**: Database query generation from Arabic questions
 
-## 📦 Prerequisites
+## Prerequisites
 
 - Node.js 20 or higher
 - MySQL 8.0
 - Docker and Docker Compose (optional)
 - npm or yarn package manager
 
-## 🚀 Installation
+## Installation
 
 ### Option 1: Docker Compose (Recommended)
 
@@ -151,7 +159,7 @@ npm install
 npm start
 ```
 
-## 🔐 Environment Variables
+## Environment Variables
 
 ### Backend (.env)
 
@@ -181,7 +189,56 @@ Update the API URL in `frontdn/src/services/formApi.js` and `frontdn/src/service
 const API_URL = "http://localhost:5000"; // Your backend URL
 ```
 
-## 📚 API Documentation
+## Running the Application
+
+### Using Docker Compose
+
+Once you've configured your environment variables, start all services:
+
+```bash
+docker-compose up --build
+```
+
+To run in detached mode:
+```bash
+docker-compose up -d
+```
+
+To stop the services:
+```bash
+docker-compose down
+```
+
+To view logs:
+```bash
+docker-compose logs -f
+```
+
+### Manual Mode
+
+**Terminal 1 - Backend:**
+```bash
+cd backdn
+npm run dev
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontdn
+npm start
+```
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+### First Time Setup
+
+1. The database tables will be created automatically on first run
+2. Create an admin account using the register endpoint or seed script
+3. Login at http://localhost:3000/login
+
+## API Documentation
 
 ### Authentication Endpoints
 
@@ -283,7 +340,7 @@ GET /api/institutes?region=CENTRAL&area=الزرقاء
 GET /api/professions?region=CENTRAL&area=الزرقاء&institute=معهد الزرقاء&gender=MALE
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 AdminDashboard-frontback/
@@ -343,7 +400,7 @@ AdminDashboard-frontback/
 └── docker-compose.yml             # Docker Compose configuration
 ```
 
-## 📖 Usage Guide
+## Usage Guide
 
 ### Admin Workflow
 
@@ -393,7 +450,7 @@ Click the chatbot button (🤖) in the bottom right corner and ask questions in 
 - كم عدد الإناث من الشمال؟ (How many females from the north?)
 - اعرض أسماء الطلاب (Show student names)
 
-## 🤖 AI Chatbot Integration
+## AI Chatbot Integration
 
 The system includes an intelligent Arabic chatbot that can query the database using natural language.
 
@@ -432,7 +489,7 @@ async def ask_question(request: QuestionRequest):
 - Conversation history maintained during session
 - Error handling and user feedback
 
-## 🧪 Testing
+## Testing
 
 ### Run Backend Tests
 
@@ -456,7 +513,7 @@ The backend includes comprehensive tests for:
 - Reference data endpoints
 - Middleware functionality
 
-## 🗄 Database Schema
+## Database Schema
 
 ### Key Tables
 
@@ -494,7 +551,7 @@ The backend includes comprehensive tests for:
 - name, areaName, regionName (Composite PK)
 - allowedGenders (JSON array)
 
-## 🔒 Security Features
+## Security Features
 
 - **JWT Authentication**: Secure token-based auth with 30-day expiration
 - **Password Hashing**: bcrypt with salt rounds
@@ -504,7 +561,7 @@ The backend includes comprehensive tests for:
 - **Input Validation**: Comprehensive data validation rules
 - **Self-Access Only**: Admins can only modify their own accounts
 
-## 🌍 Regions & Institutes Coverage
+## Regions & Institutes Coverage
 
 ### Northern Region (NORTHERN)
 - الرمثا, جرش, الكورة, المفرق, السرحان, عجلون
@@ -515,7 +572,7 @@ The backend includes comprehensive tests for:
 ### Southern Region (SOUTHERN)
 - الكرك, معان, الطفيلة, القويرة, الريشة, الجفر
 
-## 📝 Data Validation Rules
+## Data Validation Rules
 
 ### Age Restrictions
 - **Male applicants**: 17-30 years
@@ -529,7 +586,7 @@ The backend includes comprehensive tests for:
 - **Gender**: MALE, FEMALE
 - **Marks**: 0-100 (optional)
 
-## 🚧 Future Enhancements
+## Future Enhancements
 
 - [ ] Document upload system (AWS S3 integration)
 - [ ] Email notifications for status changes
@@ -541,7 +598,7 @@ The backend includes comprehensive tests for:
 - [ ] Certificate generation
 - [ ] Mobile app for applicants
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -549,15 +606,15 @@ The backend includes comprehensive tests for:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is proprietary software. All rights reserved.
 
-## 👥 Support
+## Support
 
-For support, email yaqeen.hamza98@gmail.com or create an issue in the repository.
+For support, email Yaqeen.hamza98@gmail.com or create an issue in the repository.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Vocational Training Corporation (VTC) Jordan
 - All contributing developers and testers
@@ -565,4 +622,4 @@ For support, email yaqeen.hamza98@gmail.com or create an issue in the repository
 
 ---
 
-**Built with ❤️ for Vocational Training in Jordan**
+**Built with for NET Vocational Training in Jordan**
